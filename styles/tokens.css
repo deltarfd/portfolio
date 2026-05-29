@@ -1,0 +1,187 @@
+/* Hallmark · macrostructure: Specimen · theme: Atelier (dark default + light)
+ * pre-emit critique: P4 H5 E4 S4 R5 V4 · contrast: pass (46–50)
+ * nav: N9 · footer: Ft6
+ * anchor hue: 75 (warm) · accent hue: 45 (amber-terracotta, ≤5% viewport)
+ * display: Fraunces italic · body: Inter · two-theme: default dark, opt-in light
+ */
+
+/* ==========================================================================
+   Design Tokens
+   All colour values use OKLCH exclusively. No pure #000 / #fff.
+   Two themes share one anchor hue — only lightness + chroma move between them.
+   Default (no attribute) = dark.  [data-theme="light"] = light.
+   ========================================================================== */
+
+:root {
+  /* ──────────────────────────────────────────────────────────────────────
+     DARK THEME (default) — warm near-black paper, warm near-white ink
+     ────────────────────────────────────────────────────────────────────── */
+  color-scheme: dark;
+
+  /* Paper (surfaces — elevation gets LIGHTER) */
+  --color-paper:        oklch(15%   0.012 75);   /* base */
+  --color-paper-2:      oklch(19%   0.014 75);   /* elevated surface */
+  --color-paper-3:      oklch(23%   0.016 75);   /* card / inset */
+
+  /* Ink (text) */
+  --color-ink:          oklch(94%   0.008 85);   /* primary */
+  --color-ink-2:        oklch(79%   0.011 80);   /* secondary */
+
+  /* Neutrals / rules (tinted toward anchor) */
+  --color-rule:         oklch(33%   0.012 75);   /* hairline dividers */
+  --color-rule-2:       oklch(27%   0.011 75);   /* fainter dividers */
+  --color-neutral:      oklch(60%   0.012 72);
+  --color-muted:        oklch(68%   0.013 75);   /* de-emphasised / meta text */
+
+  /* Accent — warm amber-terracotta (brightened for dark, ≤5% viewport) */
+  --color-accent:       oklch(72%   0.145 48);
+  --color-accent-hover: oklch(78%   0.155 48);
+  --color-accent-ink:   oklch(18%   0.020 60);   /* text on accent fills */
+
+  /* Focus ring (high-chroma for visibility) */
+  --color-focus:        oklch(74%   0.165 48);
+
+  /* Semantic */
+  --color-error:        oklch(70%   0.165 25);
+  --color-success:      oklch(74%   0.130 150);
+
+  /* ──────────────────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     2 display + 1 mono maximum. Referenced exclusively via custom properties.
+     ────────────────────────────────────────────────────────────────────── */
+  --font-display:       'Fraunces', 'Georgia', serif;
+  --font-body:          'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:          'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Body weight — dark mode trims 50 units to offset optical bloom */
+  --weight-body:        350;
+
+  /* Font sizes — modular scale (base 16px, ratio ~1.25) */
+  --text-xs:            0.75rem;    /* 12px */
+  --text-sm:            0.875rem;   /* 14px */
+  --text-base:          1rem;       /* 16px */
+  --text-md:            1.125rem;   /* 18px */
+  --text-lg:            1.25rem;    /* 20px */
+  --text-xl:            1.5rem;     /* 24px */
+  --text-2xl:           1.75rem;    /* 28px */
+  --text-3xl:           2.25rem;    /* 36px */
+  --text-4xl:           3rem;       /* 48px */
+  --text-5xl:           3.75rem;    /* 60px */
+  --text-6xl:           4.5rem;     /* 72px */
+
+  /* Aliases — bridge the --font-size-* names used across components */
+  --font-size-xs:       var(--text-xs);
+  --font-size-sm:       var(--text-sm);
+  --font-size-base:     var(--text-base);
+  --font-size-md:       var(--text-md);
+  --font-size-lg:       var(--text-lg);
+  --font-size-xl:       var(--text-xl);
+  --font-size-2xl:      var(--text-2xl);
+
+  /* Line heights */
+  --leading-tight:      1.15;
+  --leading-snug:       1.3;
+  --leading-normal:     1.5;
+  --leading-relaxed:    1.65;
+  --leading-loose:      1.8;
+
+  /* Letter spacing */
+  --tracking-tight:     -0.02em;
+  --tracking-normal:    0em;
+  --tracking-wide:      0.04em;
+  --tracking-wider:     0.08em;
+  --tracking-widest:    0.12em;
+
+  /* Font weights */
+  --weight-light:       300;
+  --weight-regular:     400;
+  --weight-medium:      500;
+  --weight-semibold:    600;
+  --weight-bold:        700;
+  --weight-black:       900;
+
+  /* ──────────────────────────────────────────────────────────────────────
+     SPACING — 4px base unit. Numeric scale + semantic aliases.
+     ────────────────────────────────────────────────────────────────────── */
+  --space-1:            0.25rem;    /*  4px */
+  --space-2:            0.5rem;     /*  8px */
+  --space-3:            0.75rem;    /* 12px */
+  --space-4:            1rem;       /* 16px */
+  --space-6:            1.5rem;     /* 24px */
+  --space-8:            2rem;       /* 32px */
+  --space-12:           3rem;       /* 48px */
+  --space-16:           4rem;       /* 64px */
+  --space-24:           6rem;       /* 96px */
+  --space-32:           8rem;       /* 128px */
+
+  /* Semantic aliases — used throughout layout.css + components.css */
+  --space-xs:           0.5rem;     /*  8px */
+  --space-sm:           0.75rem;    /* 12px */
+  --space-md:           1rem;       /* 16px */
+  --space-lg:           1.5rem;     /* 24px */
+  --space-xl:           2.5rem;     /* 40px */
+  --space-2xl:          4rem;       /* 64px */
+  --space-3xl:          6rem;       /* 96px */
+  --space-4xl:          9rem;       /* 144px */
+
+  /* ──────────────────────────────────────────────────────────────────────
+     LAYOUT
+     ────────────────────────────────────────────────────────────────────── */
+  --measure:            65ch;       /* optimal line length */
+  --content-max:        72rem;      /* content column cap */
+  --grid-gap:           var(--space-6);
+  --section-gap:        var(--space-16);
+  --border-thin:        1px;
+  --border-medium:      2px;
+  --radius-sm:          0.25rem;
+  --radius-md:          0.5rem;
+  --radius-full:        9999px;
+
+  /* ──────────────────────────────────────────────────────────────────────
+     MOTION
+     ────────────────────────────────────────────────────────────────────── */
+  --duration-fast:      150ms;
+  --duration-normal:    300ms;
+  --duration-slow:      500ms;
+  --easing-default:     cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in:          cubic-bezier(0.4, 0, 1, 1);
+  --easing-out:         cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   LIGHT THEME — warm cream paper, warm near-black ink.
+   Same anchor hue (75); only lightness + chroma shift. Accent darkens for
+   contrast on light paper.
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --color-paper:        oklch(96.5% 0.012 80);
+  --color-paper-2:      oklch(93.5% 0.014 80);
+  --color-paper-3:      oklch(90%   0.016 80);
+
+  --color-ink:          oklch(21%   0.012 55);
+  --color-ink-2:        oklch(39%   0.012 60);
+
+  --color-rule:         oklch(82%   0.012 78);
+  --color-rule-2:       oklch(87%   0.010 78);
+  --color-neutral:      oklch(52%   0.010 68);
+  --color-muted:        oklch(45%   0.011 64);
+
+  --color-accent:       oklch(55%   0.165 42);
+  --color-accent-hover: oklch(49%   0.180 42);
+  --color-accent-ink:   oklch(97%   0.012 80);
+
+  --color-focus:        oklch(55%   0.190 42);
+
+  --color-error:        oklch(54%   0.180 25);
+  --color-success:      oklch(52%   0.130 150);
+
+  /* Light mode restores full body weight */
+  --weight-body:        400;
+}
+
+/* ============================================================================
+   BREAKPOINTS (reference only — used in media queries in layout.css)
+   Mobile 320 · Tablet 768 · Desktop 1024 · Wide 1440
+   ============================================================================ */

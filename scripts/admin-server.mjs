@@ -1,0 +1,275 @@
+/**
+ * Local admin save-server for the custom CMS.
+ *
+ * Serves the custom admin app and the project's static files, and exposes a
+ * small JSON API to read/write the content files. Runs only on your machine —
+ * there is no auth surface and nothing is deployed. After each write it
+ * rebuilds the static site so _site stays fresh.
+ *
+ * Usage:  npm run admin   →  http://localhost:8888/admin/
+ *
+ * No external dependencies — uses Node built-ins only.
+ */
+import { createServer } from 'node:http';
+import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync, statSync, mkdirSync } from 'node:fs';
+import { resolve, extname, join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+import { execFile } from 'node:child_process';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, '..');
+const contentRoot = resolve(root, 'src', 'content');
+const siteFile = resolve(root, 'src', '_data', 'site.json');
+const PORT = 8888;
+
+const COLLECTIONS = ['experience', 'projects', 'skills', 'certifications', 'awards', 'organizations', 'education'];
+
+// Which field on each collection carries skill names (for auto-registration).
+const SKILL_FIELD = { experience: 'technologies', projects: 'tech', certifications: 'skills' };
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.woff2': 'font/woff2',
+};
+
+// Only allow writing inside src/content/<collection> or the site file.
+function safeSlug(s) {
+  return String(s).replace(/[^a-z0-9-]/gi, '').slice(0, 80);
+}
+function collectionDir(collection) {
+  if (!COLLECTIONS.includes(collection)) return null;
+  return resolve(contentRoot, collection);
+}
+
+function readCollection(collection) {
+  const dir = collectionDir(collection);
+  if (!dir || !existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => ({ slug: f.replace(/\.json$/, ''), data: JSON.parse(readFileSync(resolve(dir, f), 'utf-8')) }));
+}
+
+function rebuild() {
+  execFile('npx', ['@11ty/eleventy'], { cwd: root, shell: true }, (err) => {
+    if (err) console.error('[admin] rebuild failed:', err.message);
+    else console.log('[admin] site rebuilt');
+  });
+}
+
+/**
+ * Ensure each skill name used by an entry exists in the Skills collection.
+ * New skills are appended to the "Other Competencies" category (created if
+ * absent). Returns the number of skills newly registered.
+ */
+function ensureSkills(names) {
+  const list = (names || []).map((s) => String(s).trim()).filter(Boolean);
+  if (!list.length) return 0;
+  const dir = collectionDir('skills');
+  const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
+  const cats = files.map((f) => ({ file: f, data: JSON.parse(readFileSync(resolve(dir, f), 'utf-8')) }));
+
+  // Build a case-insensitive set of all existing skill names.
+  const known = new Set();
+  for (const c of cats) for (const s of (c.data.skills || [])) known.add(s.toLowerCase());
+
+  const toAdd = list.filter((s) => !known.has(s.toLowerCase()));
+  if (!toAdd.length) return 0;
+
+  // Find (or create) the "Other Competencies" catch-all category.
+  let other = cats.find((c) => /other/i.test(c.data.category || ''));
+  if (!other) {
+    const order = Math.max(0, ...cats.map((c) => c.data.order || 0)) + 1;
+    other = { file: 'other-competencies.json', data: { order, category: 'Other Competencies', featured: false, skills: [] } };
+    cats.push(other);
+  }
+  other.data.skills = [...(other.data.skills || []), ...toAdd];
+  writeFileSync(resolve(dir, other.file), JSON.stringify(other.data, null, 2) + '\n', 'utf-8');
+  return toAdd.length;
+}
+
+function sendJson(res, code, obj) {
+  const body = JSON.stringify(obj);
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(body);
+}
+
+function readBody(req) {
+  return new Promise((res) => {
+    let data = '';
+    let tooBig = false;
+    const LIMIT = 12 * 1024 * 1024; // 12 MB — generous for a profile photo
+    req.on('data', (c) => {
+      data += c;
+      if (data.length > LIMIT) { tooBig = true; req.destroy(); }
+    });
+    req.on('end', () => {
+      if (tooBig) return res({ __error: 'payload too large' });
+      try { res(data ? JSON.parse(data) : {}); } catch { res({}); }
+    });
+  });
+}
+
+function serveStatic(req, res, urlPath) {
+  // Map URL to a file within the project root, with traversal protection.
+  let rel = decodeURIComponent(urlPath.split('?')[0]);
+  if (rel === '/' || rel === '/admin' || rel === '/admin/') rel = '/admin/index.html';
+  const filePath = normalize(join(root, rel));
+  if (!filePath.startsWith(root)) { res.writeHead(403); res.end('Forbidden'); return; }
+  // Prefer src/admin for /admin/* so we serve the source admin app directly.
+  let target = filePath;
+  if (rel.startsWith('/admin/')) {
+    target = normalize(join(root, 'src', rel));
+  } else if (rel.startsWith('/assets/media/')) {
+    target = normalize(join(root, 'src', 'content', 'media', rel.replace(/^\/assets\/media\//, '')));
+  }
+  if (!existsSync(target) || statSync(target).isDirectory()) { res.writeHead(404); res.end('Not found'); return; }
+  const type = MIME[extname(target)] || 'application/octet-stream';
+  res.writeHead(200, { 'Content-Type': type });
+  res.end(readFileSync(target));
+}
+
+const server = createServer(async (req, res) => {
+  const { url, method } = req;
+
+  // ── API ──────────────────────────────────────────────────────────────
+  if (url.startsWith('/api/')) {
+    try {
+      if (url === '/api/data' && method === 'GET') {
+        const out = { site: JSON.parse(readFileSync(siteFile, 'utf-8')) };
+        for (const c of COLLECTIONS) out[c] = readCollection(c);
+        return sendJson(res, 200, out);
+      }
+
+      if (url === '/api/site' && method === 'PUT') {
+        const body = await readBody(req);
+        writeFileSync(siteFile, JSON.stringify(body.data, null, 2) + '\n', 'utf-8');
+        rebuild();
+        return sendJson(res, 200, { ok: true });
+      }
+
+      if (url === '/api/entry' && method === 'POST') {
+        const { collection, slug, data } = await readBody(req);
+        const dir = collectionDir(collection);
+        if (!dir) return sendJson(res, 400, { error: 'bad collection' });
+        const name = safeSlug(slug) || ('entry-' + Date.now());
+        writeFileSync(resolve(dir, name + '.json'), JSON.stringify(data, null, 2) + '\n', 'utf-8');
+        // Auto-register any new skills used by this entry into the Skills collection.
+        let addedSkills = 0;
+        const skillField = SKILL_FIELD[collection];
+        if (skillField && Array.isArray(data[skillField])) addedSkills = ensureSkills(data[skillField]);
+        rebuild();
+        return sendJson(res, 200, { ok: true, slug: name, addedSkills });
+      }
+
+      if (url === '/api/upload' && method === 'POST') {
+        // Body: { filename, dataUrl }  (dataUrl = "data:<mime>;base64,<...>")
+        const body = await readBody(req);
+        if (body.__error) return sendJson(res, 413, { error: 'Image too large (max 12 MB).' });
+        const { filename, dataUrl } = body;
+        const m = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl || '');
+        if (!m) return sendJson(res, 400, { error: 'invalid image data' });
+        const ext = (filename && filename.includes('.'))
+          ? filename.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '')
+          : 'png';
+        const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'].includes(ext) ? ext : 'png';
+        const safeName = 'profile.' + safeExt;
+        const assetsDir = resolve(root, 'assets');
+        writeFileSync(resolve(assetsDir, safeName), Buffer.from(m[2], 'base64'));
+        rebuild();
+        return sendJson(res, 200, { ok: true, path: 'assets/' + safeName });
+      }
+
+      if (url === '/api/upload' && method === 'DELETE') {
+        // Remove any uploaded profile.* photo (reset to default/placeholder).
+        const assetsDir = resolve(root, 'assets');
+        for (const ext of ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif']) {
+          const fp = resolve(assetsDir, 'profile.' + ext);
+          if (existsSync(fp)) { try { unlinkSync(fp); } catch (e) { /* ignore */ } }
+        }
+        rebuild();
+        return sendJson(res, 200, { ok: true });
+      }
+
+      if (url === '/api/media' && method === 'POST') {
+        // Generic media upload — unique filename under assets/media/.
+        // Body: { filename, dataUrl }  (dataUrl = "data:<mime>;base64,<...>")
+        const body = await readBody(req);
+        if (body.__error) return sendJson(res, 413, { error: 'Image too large (max 12 MB).' });
+        const { filename, dataUrl } = body;
+        const m = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl || '');
+        if (!m) return sendJson(res, 400, { error: 'invalid image data' });
+        const rawExt = (filename && filename.includes('.'))
+          ? filename.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '')
+          : 'png';
+        const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'].includes(rawExt) ? rawExt : 'png';
+        const base = safeSlug((filename || 'image').replace(/\.[^.]+$/, '')) || 'image';
+        const unique = `${base}-${Date.now().toString(36)}.${safeExt}`;
+        const mediaDir = resolve(root, 'src', 'content', 'media');
+        if (!existsSync(mediaDir)) mkdirSync(mediaDir, { recursive: true });
+        writeFileSync(resolve(mediaDir, unique), Buffer.from(m[2], 'base64'));
+        rebuild();
+        return sendJson(res, 200, { ok: true, path: 'assets/media/' + unique });
+      }
+
+      if (url === '/api/entry' && method === 'DELETE') {
+        const { collection, slug } = await readBody(req);
+        const dir = collectionDir(collection);
+        if (!dir) return sendJson(res, 400, { error: 'bad collection' });
+        const file = resolve(dir, safeSlug(slug) + '.json');
+        if (existsSync(file)) unlinkSync(file);
+        rebuild();
+        return sendJson(res, 200, { ok: true });
+      }
+
+      if (url === '/api/reorder' && method === 'POST') {
+        // Body: { collection, slugs: [...] } — writes order = index+1 to each
+        // entry in the given sequence, then rebuilds once.
+        const { collection, slugs } = await readBody(req);
+        const dir = collectionDir(collection);
+        if (!dir) return sendJson(res, 400, { error: 'bad collection' });
+        if (!Array.isArray(slugs)) return sendJson(res, 400, { error: 'slugs must be an array' });
+        let written = 0;
+        slugs.forEach((slug, i) => {
+          const file = resolve(dir, safeSlug(slug) + '.json');
+          if (existsSync(file)) {
+            const data = JSON.parse(readFileSync(file, 'utf-8'));
+            data.order = i + 1;
+            writeFileSync(file, JSON.stringify(data, null, 2) + '\n', 'utf-8');
+            written++;
+          }
+        });
+        rebuild();
+        return sendJson(res, 200, { ok: true, written });
+      }
+
+      return sendJson(res, 404, { error: 'unknown endpoint' });
+    } catch (e) {
+      return sendJson(res, 500, { error: e.message });
+    }
+  }
+
+  // ── Static ───────────────────────────────────────────────────────────
+  serveStatic(req, res, url);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n  Port ${PORT} is already in use — an admin server is probably already running.\n  Open http://localhost:${PORT}/admin/ in your browser, or stop the other process and retry.\n`);
+    process.exit(1);
+  }
+  throw err;
+});
+
+server.listen(PORT, () => {
+  console.log(`\n  Custom admin running:  http://localhost:${PORT}/admin/\n  Edits write to src/content + src/_data, then rebuild _site.\n  Press Ctrl+C to stop.\n`);
+});

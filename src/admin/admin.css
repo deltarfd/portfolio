@@ -1,0 +1,472 @@
+/* ==========================================================================
+   Custom admin styles — built on the portfolio's design tokens (tokens.css),
+   so it shares the exact Atelier theme and the same dark/light switch.
+   ========================================================================== */
+
+* , *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* Reserve the scrollbar gutter so the centered layout doesn't shift
+     between short pages (no scrollbar) and long ones (scrollbar). */
+  scrollbar-gutter: stable;
+}
+
+html, body {
+  margin: 0;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: var(--weight-body, 400);
+  line-height: var(--leading-normal);
+  min-height: 100vh;
+  transition: background-color var(--duration-normal) var(--easing-default),
+              color var(--duration-normal) var(--easing-default);
+}
+
+a { color: var(--color-accent); text-decoration: none; }
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.adm-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.5rem;
+  background-color: color-mix(in oklab, var(--color-paper) 90%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.adm-wordmark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+  letter-spacing: var(--tracking-tight);
+}
+.adm-wordmark span {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-left: 0.4em;
+}
+
+.adm-top__actions { display: flex; align-items: center; gap: 1rem; }
+.adm-status { font-size: var(--text-sm); color: var(--color-muted); min-height: 1.2em; }
+.adm-status.is-ok { color: var(--color-success); }
+.adm-status.is-err { color: var(--color-error); }
+
+.adm-theme {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; flex-shrink: 0;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-full);
+  background: transparent; color: var(--color-ink-2); cursor: pointer;
+  transition: color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default);
+}
+.adm-theme svg { width: 18px; height: 18px; }
+.adm-theme:hover { color: var(--color-accent); border-color: var(--color-accent); }
+.adm-theme__sun { display: none; } .adm-theme__moon { display: block; }
+[data-theme="light"] .adm-theme__moon { display: none; }
+[data-theme="light"] .adm-theme__sun { display: block; }
+
+/* ── Shell layout ────────────────────────────────────────────────────── */
+.adm-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding: 2rem 1.5rem 4rem;
+  gap: 2rem;
+}
+@media (min-width: 860px) {
+  .adm-shell { grid-template-columns: 16rem 1fr; align-items: start; gap: 2.5rem; }
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.adm-side {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  padding: 1.25rem;
+  position: sticky;
+  top: 5.5rem;
+}
+.adm-side__title {
+  font-family: var(--font-display); font-style: italic;
+  font-size: var(--text-md); color: var(--color-ink);
+  margin: 0 0 1rem 0;
+}
+.adm-nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.adm-nav button {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  width: 100%; text-align: left;
+  padding: 0.6rem 0.85rem;
+  border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--color-ink-2);
+  font-family: var(--font-body); font-size: var(--text-sm); cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+.adm-nav button:hover { background: var(--color-paper-3); color: var(--color-ink); }
+.adm-nav button.is-active {
+  background: color-mix(in oklab, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+.adm-count {
+  font-family: var(--font-mono); font-size: var(--text-xs);
+  color: var(--color-muted); background: var(--color-paper-3);
+  border-radius: var(--radius-full); padding: 0.1rem 0.55rem; line-height: 1.4;
+}
+.adm-nav button.is-active .adm-count { color: var(--color-accent); background: color-mix(in oklab, var(--color-accent) 22%, transparent); }
+
+/* ── Main panel ──────────────────────────────────────────────────────── */
+.adm-main { min-width: 0; }
+.adm-loading { color: var(--color-muted); }
+
+.adm-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+  padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-rule);
+}
+.adm-head h1 {
+  font-family: var(--font-display); font-style: italic; font-weight: var(--weight-semibold);
+  font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  color: var(--color-ink); margin: 0; letter-spacing: var(--tracking-tight); line-height: 1.1;
+}
+.adm-head__meta { display: flex; flex-direction: column; gap: 0.25rem; }
+.adm-head__sub { color: var(--color-muted); font-size: var(--text-sm); margin: 0; }
+
+/* Editor header — stack a Back link above the title. */
+.adm-head--form { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+.adm-form__back { padding-inline: 0; }
+
+/* ── Entry list ──────────────────────────────────────────────────────── */
+.adm-list { display: flex; flex-direction: column; gap: 1rem; }
+.adm-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-md);
+  background: var(--color-paper-2); padding: 1.25rem 1.5rem;
+  transition: border-color var(--duration-fast) var(--easing-default),
+              transform var(--duration-fast) var(--easing-default);
+}
+.adm-card:hover { border-color: var(--color-accent); transform: translateY(-1px); }
+.adm-card__body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.35rem; text-align: left; }
+.adm-card__title {
+  font-family: var(--font-display); font-style: italic; font-size: var(--text-lg);
+  color: var(--color-ink); margin: 0; line-height: var(--leading-snug);
+}
+.adm-card__meta { font-size: var(--text-sm); color: var(--color-ink-2); margin: 0; line-height: 1.5; }
+.adm-card__tags { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; }
+.adm-card__pos {
+  font-family: var(--font-mono); font-size: var(--text-xs);
+  color: var(--color-muted); background: var(--color-paper-3);
+  border-radius: var(--radius-full); padding: 0.1rem 0.5rem; line-height: 1.4;
+}
+.adm-card__tag {
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-accent);
+  border: 1px solid color-mix(in oklab, var(--color-accent) 50%, transparent);
+  border-radius: var(--radius-full); padding: 0.1rem 0.55rem;
+}
+
+/* Drag-to-reorder */
+.adm-card__handle {
+  flex-shrink: 0; align-self: stretch;
+  display: flex; align-items: center; justify-content: center;
+  width: 2rem; padding: 0;
+  border: none; background: transparent; color: var(--color-muted);
+  font-size: 1.1rem; cursor: grab; line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast) var(--easing-default),
+              background-color var(--duration-fast) var(--easing-default);
+}
+.adm-card__handle:hover { color: var(--color-accent); background: var(--color-paper-3); }
+.adm-card.is-draggable { cursor: default; }
+.adm-card.is-dragging { opacity: 0.5; border-color: var(--color-accent); }
+.adm-card.is-hidden { opacity: 0.5; filter: grayscale(100%); }
+.adm-reorder-hint {
+  font-size: var(--text-xs); color: var(--color-muted);
+  margin: -0.75rem 0 1.25rem; line-height: var(--leading-normal);
+}
+.adm-card__actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.adm-empty {
+  border: 1px dashed var(--color-rule); border-radius: var(--radius-md);
+  padding: 2rem; text-align: center; color: var(--color-muted); font-size: var(--text-sm);
+}
+
+/* ── Toolbar (search + sort) ─────────────────────────────────────────── */
+.adm-toolbar {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.adm-toolbar__field {
+  position: relative; flex: 1 1 16rem; min-width: 0;
+}
+.adm-toolbar__icon {
+  position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+  font-size: 0.85rem; opacity: 0.6; pointer-events: none;
+}
+.adm-toolbar__search {
+  width: 100%; font-family: var(--font-body); font-size: var(--text-sm);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.55rem 0.8rem 0.55rem 2.1rem;
+}
+.adm-toolbar__search:focus { outline: none; border-color: var(--color-accent); }
+.adm-toolbar__sortwrap { display: inline-flex; align-items: center; gap: 0.5rem; }
+.adm-toolbar__sortwrap > span {
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.adm-toolbar__sort {
+  font-family: var(--font-body); font-size: var(--text-sm);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.5rem 0.7rem; cursor: pointer;
+}
+.adm-toolbar__sort:focus { outline: none; border-color: var(--color-accent); }
+
+/* Month picker — two dropdowns (Month + Year) composing to YYYY-MM */
+.adm-monthfield { display: flex; gap: 0.6rem; }
+.adm-monthfield select {
+  flex: 1; min-width: 0; font-family: var(--font-body); font-size: var(--text-base);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem; cursor: pointer;
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+.adm-monthfield select:focus { outline: none; border-color: var(--color-accent); }
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: var(--weight-medium);
+  padding: 0.55rem 1rem; border-radius: var(--radius-sm); cursor: pointer;
+  border: 1px solid var(--color-rule); background: transparent; color: var(--color-ink);
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+.btn:hover { border-color: var(--color-ink-2); background: var(--color-paper-3); }
+.btn--primary { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
+.btn--primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.btn--ghost { border-color: transparent; color: var(--color-ink-2); padding-inline: 0.6rem; }
+.btn--ghost:hover { color: var(--color-accent); background: transparent; }
+.btn--danger { color: var(--color-error); border-color: transparent; background: transparent; }
+.btn--danger:hover { background: color-mix(in oklab, var(--color-error) 14%, transparent); }
+.btn--icon { padding: 0.55rem; border-color: transparent; background: transparent; color: var(--color-ink-2); line-height: 0; display: inline-flex; align-items: center; justify-content: center; }
+.btn--icon:hover { color: var(--color-accent); background: var(--color-paper-3); }
+.btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* ── Form (editor) ───────────────────────────────────────────────────── */
+.adm-form {
+  border: 1px solid var(--color-rule); border-radius: var(--radius-md);
+  background: var(--color-paper-2); padding: 2rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  max-width: 48rem;
+}
+.adm-field { display: flex; flex-direction: column; gap: 0.5rem; }
+.adm-field > label {
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.adm-field input[type="text"],
+.adm-field input[type="number"],
+.adm-field textarea,
+.adm-field select {
+  width: 100%; font-family: var(--font-body); font-size: var(--text-base);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+.adm-field textarea { min-height: 5.5rem; resize: vertical; line-height: var(--leading-relaxed); }
+.adm-field input:focus, .adm-field textarea:focus, .adm-field select:focus {
+  outline: none; border-color: var(--color-accent);
+}
+.adm-field__hint { font-size: var(--text-xs); color: var(--color-muted); }
+
+.adm-checkbox { flex-direction: row; align-items: center; gap: 0.75rem; }
+.adm-checkbox input {
+  appearance: none; -webkit-appearance: none;
+  position: relative; flex-shrink: 0; cursor: pointer;
+  width: 2.4rem; height: 1.35rem;
+  border-radius: var(--radius-full); border: 1px solid var(--color-rule);
+  background: var(--color-paper-3);
+  transition: background-color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default);
+}
+.adm-checkbox input::after {
+  content: ''; position: absolute; top: 50%; left: 0.18rem; transform: translateY(-50%);
+  width: 1rem; height: 1rem; border-radius: 50%;
+  background: var(--color-ink-2);
+  transition: transform var(--duration-fast) var(--easing-default),
+              background-color var(--duration-fast) var(--easing-default);
+}
+.adm-checkbox input:checked { background: var(--color-accent); border-color: var(--color-accent); }
+.adm-checkbox input:checked::after { transform: translateY(-50%) translateX(1.05rem); background: var(--color-accent-ink); }
+.adm-checkbox input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.adm-checkbox label { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+.adm-checkbox__name { font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-ink); letter-spacing: 0; text-transform: none; }
+
+/* Info icon + tooltip — keeps labels short, reveals detail on hover/focus */
+.adm-info {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.05rem; height: 1.05rem; flex-shrink: 0;
+  border: 1px solid var(--color-rule); border-radius: 50%;
+  background: transparent; color: var(--color-muted); cursor: help;
+  font-family: var(--font-mono); font-size: 0.62rem; font-style: italic; line-height: 1;
+  padding: 0;
+  transition: color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default);
+}
+.adm-info:hover, .adm-info:focus-visible { color: var(--color-accent); border-color: var(--color-accent); outline: none; }
+.adm-info__bubble {
+  position: absolute; bottom: calc(100% + 0.5rem); left: 50%; transform: translateX(-50%);
+  z-index: 40; width: max-content; max-width: 16rem;
+  font-family: var(--font-body); font-size: var(--text-xs); font-style: normal;
+  line-height: var(--leading-normal); letter-spacing: 0;
+  color: var(--color-ink); background: var(--color-paper-2);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.45rem 0.6rem; text-align: left;
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0,0,0,0.35));
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--duration-fast) var(--easing-default),
+              visibility var(--duration-fast) var(--easing-default);
+}
+.adm-info:hover .adm-info__bubble, .adm-info:focus-visible .adm-info__bubble { opacity: 1; visibility: visible; }
+
+/* List-of-strings widget */
+.adm-listfield {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.85rem; background: color-mix(in oklab, var(--color-paper) 40%, var(--color-paper-2));
+}
+.adm-listrow { display: flex; gap: 0.5rem; align-items: flex-start; }
+.adm-listrow textarea, .adm-listrow input { flex: 1; }
+.adm-listrow .btn { flex-shrink: 0; padding: 0.4rem 0.7rem; }
+.adm-listfield > .btn { align-self: flex-start; }
+
+/* Skills widget — chips + filtering typeahead */
+.adm-skillsfield {
+  display: flex; flex-direction: column; gap: 0.7rem;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.85rem; background: color-mix(in oklab, var(--color-paper) 40%, var(--color-paper-2));
+}
+.adm-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.adm-chip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-family: var(--font-body); font-size: var(--text-sm);
+  color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-accent) 45%, transparent);
+  border-radius: var(--radius-full); padding: 0.2rem 0.3rem 0.2rem 0.7rem;
+}
+.adm-chip__x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.1rem; height: 1.1rem; border: none; border-radius: 50%;
+  background: transparent; color: var(--color-accent); cursor: pointer;
+  font-size: 0.9rem; line-height: 1;
+}
+.adm-chip__x:hover { background: color-mix(in oklab, var(--color-accent) 25%, transparent); }
+
+/* Filtering typeahead (replaces the long native datalist) */
+.adm-typeahead { position: relative; }
+.adm-typeahead__input {
+  width: 100%; font-family: var(--font-body); font-size: var(--text-base);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+.adm-typeahead__input:focus { outline: none; border-color: var(--color-accent); }
+.adm-typeahead__popup {
+  position: absolute; z-index: 30; top: calc(100% + 0.35rem); left: 0; right: 0;
+  display: flex; flex-direction: column;
+  max-height: 16rem; overflow-y: auto;
+  background: var(--color-paper-2); border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm); padding: 0.3rem;
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0,0,0,0.35));
+}
+.adm-typeahead__popup[hidden] { display: none; }
+.adm-typeahead__opt {
+  display: flex; align-items: center; gap: 0.5rem;
+  width: 100%; text-align: left; cursor: pointer;
+  font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-ink-2);
+  background: transparent; border: none; border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+.adm-typeahead__opt:hover, .adm-typeahead__opt.is-active { background: var(--color-paper-3); color: var(--color-ink); }
+.adm-typeahead__opt--new { color: var(--color-accent); }
+.adm-typeahead__newtag {
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+  border-radius: var(--radius-full); padding: 0.05rem 0.4rem;
+}
+
+/* Image upload field */
+.adm-imagefield { display: flex; flex-direction: column; gap: 0.75rem; }
+.adm-image-preview {
+  width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
+  border: 1px solid var(--color-rule); background: var(--color-paper-3);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.adm-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+.adm-image-empty { font-size: var(--text-xs); color: var(--color-muted); text-align: center; padding: 0 0.5rem; }
+
+/* Generic media field — rectangular preview */
+.adm-mediafield { display: flex; flex-direction: column; gap: 0.75rem; }
+.adm-media-preview {
+  width: 100%; max-width: 22rem; aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm); overflow: hidden;
+  border: 1px solid var(--color-rule); background: var(--color-paper-3);
+  display: flex; align-items: center; justify-content: center;
+}
+.adm-media-preview img { width: 100%; height: 100%; object-fit: contain; }
+.adm-media-url {
+  flex: 1; min-width: 0; font-family: var(--font-body); font-size: var(--text-sm);
+  color: var(--color-ink); background: var(--color-paper-3);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+}
+.adm-media-url:focus { outline: none; border-color: var(--color-accent); }
+
+/* Multi-image (gallery) field */
+.adm-medialist { display: flex; flex-direction: column; gap: 0.85rem; }
+.adm-mediacard {
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-sm);
+  padding: 0.75rem; background: color-mix(in oklab, var(--color-paper) 40%, var(--color-paper-2));
+}
+.adm-media-preview--sm { width: 8rem; max-width: 8rem; flex-shrink: 0; }
+.adm-mediacard__controls { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.adm-mediacard__btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.adm-mediacard__btns .btn { padding: 0.4rem 0.7rem; }
+.adm-mediacard__btns .btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+.adm-form__actions {
+  display: flex; gap: 0.75rem; justify-content: flex-end; align-items: center;
+  border-top: 1px solid var(--color-rule); padding-top: 1.5rem; margin-top: 0.5rem;
+}
+.adm-form__actions .btn--ghost { margin-right: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  html, body, .adm-theme, .btn, .adm-card, .adm-nav button, .adm-field input,
+  .adm-field textarea, .adm-field select, .adm-monthfield select,
+  .adm-checkbox input, .adm-checkbox input::after, .adm-typeahead__input,
+  .adm-typeahead__opt { transition: none; }
+}

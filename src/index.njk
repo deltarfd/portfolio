@@ -1,0 +1,389 @@
+---
+permalink: /index.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#1a1714">
+  <meta name="description" content="{{ site.metaDescription }}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="{{ site.name }} — Software Engineer">
+  <meta property="og:description" content="Personal portfolio showcasing mobile development expertise, certifications, and professional experience.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+
+  <title>{{ site.name }} — Software Engineer</title>
+
+  <!-- Theme bootstrap — runs before paint to prevent flash of wrong theme. -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var theme = saved
+          || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        if (theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) { /* default dark */ }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <header class="nav-edge" role="banner">
+    <nav aria-label="Primary navigation" role="navigation">
+      <a href="#hero" class="nav-wordmark">{{ site.wordmark }}</a>
+
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="#hero" class="nav-link" data-section="hero">About</a></li>
+        <li><a href="#experience" class="nav-link" data-section="experience">Experience</a></li>
+        <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
+        <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
+        <li><a href="#certifications" class="nav-link" data-section="certifications">Certifications</a></li>
+        <li><a href="#awards" class="nav-link" data-section="awards">Awards</a></li>
+        <li><a href="#education" class="nav-link" data-section="education">Education</a></li>
+        <li><a href="#organizations" class="nav-link" data-section="organizations">Organizations</a></li>
+        <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme" title="Toggle light / dark theme">
+          <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-overlay" aria-label="Open navigation menu">
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+        </button>
+      </div>
+
+      <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+        <ul class="nav-overlay__links" role="list">
+          <li><a href="#hero" class="nav-overlay__link" data-section="hero">About</a></li>
+          <li><a href="#experience" class="nav-overlay__link" data-section="experience">Experience</a></li>
+          <li><a href="#projects" class="nav-overlay__link" data-section="projects">Projects</a></li>
+          <li><a href="#skills" class="nav-overlay__link" data-section="skills">Skills</a></li>
+          <li><a href="#certifications" class="nav-overlay__link" data-section="certifications">Certifications</a></li>
+          <li><a href="#awards" class="nav-overlay__link" data-section="awards">Awards</a></li>
+          <li><a href="#education" class="nav-overlay__link" data-section="education">Education</a></li>
+          <li><a href="#organizations" class="nav-overlay__link" data-section="organizations">Organizations</a></li>
+          <li><a href="#contact" class="nav-overlay__link" data-section="contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <!-- Hero -->
+    <section id="hero" aria-label="Introduction" class="hero">
+      <div class="hero__photo-col">
+        <picture class="hero__photo-wrapper">
+          {% if site.photo %}
+          <img src="/{{ site.photo }}" alt="{{ site.photoAlt }}" class="hero__photo" width="240" height="240" loading="eager"
+            onerror="this.parentElement.classList.add('hero__photo-wrapper--fallback'); this.style.display='none';">
+          {% else %}
+          <span class="hero__photo-placeholder" aria-hidden="true"></span>
+          {% endif %}
+        </picture>
+      </div>
+      <div class="hero__text-col">
+        <span class="hero__eyebrow">{{ site.eyebrow }}</span>
+        <h1 class="hero__name">{{ site.name }}</h1>
+        <h2 class="hero__title">{{ site.title }}</h2>
+        <p class="hero__summary">{{ site.summary }}</p>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience" aria-label="Professional experience">
+      <div class="section-head">
+        <span class="section-head__num">01 —</span>
+        <h2 class="section-head__title">EXPERIENCE</h2>
+      </div>
+      {% for role in experience.items %}
+      <article class="role-entry">
+        <h3 class="role-entry__heading">{{ role.title }}</h3>
+        <p class="role-entry__meta">{{ role.meta }}</p>
+        {% if role.responsibilities and role.responsibilities.length %}
+        <ul class="role-entry__responsibilities">
+          {% for item in role.responsibilities %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% if role.technologies and role.technologies.length %}
+        <ul class="chip-list" aria-label="Technologies used">
+          {% for t in role.technologies %}<li class="chip">{{ t }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" aria-label="Projects">
+      <div class="section-head">
+        <span class="section-head__num">02 —</span>
+        <h2 class="section-head__title">PROJECTS</h2>
+      </div>
+      <ul class="project-grid" aria-label="Selected projects">
+        {% for p in projects.items | sortProjects %}
+        {% set pMedia = p | projectMedia %}
+        <li class="project-card{% if p.featured %} project-card--featured{% endif %}">
+          {% if pMedia.length %}
+          <div class="project-card__gallery{% if pMedia.length > 1 %} has-multiple{% endif %}"
+               role="group" aria-roledescription="carousel" aria-label="{{ p.name }} preview images"
+               data-gallery data-count="{{ pMedia.length }}">
+            <div class="project-card__track" data-gallery-track>
+              {% for src in pMedia %}
+              {% set imgSrc = src | mediaSrc %}
+              <div class="project-card__slide" style="background-image:url('{{ imgSrc }}')" role="group" aria-roledescription="slide" aria-label="Image {{ loop.index }} of {{ pMedia.length }}">
+                <img src="{{ imgSrc }}" alt="{{ p.name }} preview {{ loop.index }}" loading="lazy" data-zoomable tabindex="0" role="button" aria-label="Zoom {{ p.name }} preview {{ loop.index }}">
+              </div>
+              {% endfor %}
+            </div>
+            {% if pMedia.length > 1 %}
+            <div class="project-card__arrows" aria-hidden="false">
+              <button type="button" class="project-card__nav project-card__nav--prev" data-gallery-prev aria-label="Previous image">‹</button>
+              <button type="button" class="project-card__nav project-card__nav--next" data-gallery-next aria-label="Next image">›</button>
+            </div>
+            <div class="project-card__dots" aria-label="Choose image" data-gallery-dots>
+              {% for src in pMedia %}
+              <button type="button" class="project-card__dot{% if loop.first %} is-active{% endif %}" data-gallery-dot="{{ loop.index0 }}" aria-label="Go to image {{ loop.index }}"{% if loop.first %} aria-current="true"{% endif %}></button>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+          <div class="project-card__head">
+            <h3 class="project-card__title">{{ p.name }}</h3>
+            {% if p.featured %}<span class="badge badge--featured">Featured</span>{% endif %}
+          </div>
+          <p class="project-card__role">{{ p.role }}</p>
+          <p class="project-card__desc">{{ p.description }}</p>
+          {% if p.tech and p.tech.length %}
+          <ul class="chip-list" aria-label="Technologies used">
+            {% for t in p.tech %}<li class="chip">{{ t }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+          {% if p.url %}<a class="project-card__link" href="{{ p.url }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ p.name }} on GitHub">View on GitHub ↗</a>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="project-more">
+        <a href="{{ site.github }}" target="_blank" rel="noopener noreferrer" aria-label="See all repositories on GitHub">See all repositories on GitHub ↗</a>
+      </p>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" aria-label="Technical skills">
+      <div class="section-head">
+        <span class="section-head__num">03 —</span>
+        <h2 class="section-head__title">SKILLS</h2>
+      </div>
+      <div class="skills-categories">
+        {% for cat in skills.items %}
+        <div class="skill-category{% if cat.featured %} skill-category--featured{% endif %}">
+          <h3 class="skill-category__heading{% if cat.featured %} skill-category__heading--featured{% endif %}">{{ cat.category }}</h3>
+          <ul class="chip-list" aria-label="{{ cat.category }} skills">
+            {% for s in cat.skills %}<li><span class="chip{% if cat.featured %} chip--accent{% endif %}">{{ s }}</span></li>{% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Certifications -->
+    {% set sortedCerts = certifications.items | certNormalizeSort %}
+    <section id="certifications" aria-label="Certifications">
+      <div class="section-head">
+        <span class="section-head__num">04 —</span>
+        <h2 class="section-head__title">CERTIFICATIONS</h2>
+      </div>
+      <p class="cert-count">{{ sortedCerts.length }} total</p>
+      <div class="cert-list">
+        {% for c in sortedCerts %}
+        {% set expired = c | certExpired %}
+        {% if loop.index0 == 6 %}<div class="cert-hidden" id="cert-hidden">{% endif %}
+        <article class="cert-entry{% if c.isKey %} cert-entry--key{% endif %}{% if expired %} cert-entry--expired{% endif %}">
+          <div class="cert-entry__header">
+            <h3 class="cert-entry__name">{{ c.name }}</h3>
+            {% if c.isKey %}<span class="badge badge--featured">Featured</span>{% elif expired %}<span class="badge badge--expired">Expired</span>{% endif %}
+          </div>
+          <p class="cert-entry__org">{{ c.organization }}</p>
+          {% set cIssued = c | certIssued %}
+          <p class="cert-entry__date">{% if cIssued %}Issued {{ cIssued }} · {% endif %}{{ c | certDate }}</p>
+          {% if c.media %}
+          <a class="cert-entry__media" href="{{ c.media | mediaSrc }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ c.name }} certificate">
+            <img src="{{ c.media | mediaSrc }}" alt="{{ c.name }} certificate" loading="lazy">
+          </a>
+          {% endif %}
+          {% if c.skills and c.skills.length %}
+          <ul class="chip-list cert-entry__skills" aria-label="Skills">
+            {% for s in c.skills %}<li class="chip chip--sm">{{ s }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+          {% if c.credentialUrl %}
+          <a class="cert-entry__verify" href="{{ c.credentialUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Verify {{ c.name }}">Verify credential ↗</a>
+          {% endif %}
+        </article>
+        {% if loop.last and sortedCerts.length > 6 %}</div>{% endif %}
+        {% endfor %}
+      </div>
+      {% if sortedCerts.length > 6 %}
+      <button type="button" class="expand-btn" id="cert-expand-btn" aria-expanded="false" aria-controls="cert-hidden">Show all {{ sortedCerts.length }}</button>
+      <noscript>
+        <style>.cert-hidden { display: block !important; } #cert-expand-btn { display: none !important; }</style>
+      </noscript>
+      {% endif %}
+    </section>
+
+    <!-- Awards -->
+    {% set sortedAwards = awards.items | sortAwards %}
+    {% set competition = sortedAwards | awardsByCategory('competition') %}
+    <section id="awards" aria-label="Awards and honors">
+      <div class="section-head">
+        <span class="section-head__num">05 —</span>
+        <h2 class="section-head__title">AWARDS</h2>
+      </div>
+
+      {% if competition.length %}
+      <div class="awards-group" data-category="competition">
+        <h3 class="awards-group__heading">Competition Results</h3>
+        <ol class="awards-list" aria-label="Competition Results">
+          {% for a in competition %}
+          <li class="award-entry{% if a.placement == '1st Place' %} award-entry--first{% endif %}"{% if loop.index0 >= 10 %} hidden{% endif %}>
+            <span class="award-entry__year">{{ a.year }}</span>
+            <div class="award-entry__body">
+              {% if a.placement == '1st Place' %}<span class="badge badge--placement">1st Place</span>{% else %}<span class="award-entry__placement">{{ a.placement }}</span>{% endif %}
+              <p class="award-entry__title">{{ a.title }}</p>
+              <p class="award-entry__event">{{ a.eventName }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+
+      {% if competition.length > 10 %}
+      <button class="expand-btn awards-show-more" type="button" aria-expanded="false" aria-label="Show more awards" data-awards-toggle>Show more</button>
+      <noscript>
+        <style>
+          .awards-list [hidden] { display: list-item !important; }
+          .awards-show-more { display: none !important; }
+        </style>
+      </noscript>
+      {% endif %}
+    </section>
+
+    <!-- Education -->
+    {% set academicAwards = (awards.items | sortAwards | awardsByCategory('academic')) %}
+    <section id="education" aria-label="Education">
+      <div class="section-head">
+        <span class="section-head__num">06 —</span>
+        <h2 class="section-head__title">EDUCATION</h2>
+      </div>
+      <div class="edu-list">
+        {% for e in education.items %}
+        <div class="card edu-card">
+          <p class="edu-degree">{{ e.degreeLine }}</p>
+          <p class="edu-institution">{{ e.institution }}</p>
+          <p class="edu-meta">{{ e.period }}{% if e.gpaLine %} · {{ e.gpaLine }}{% endif %}</p>
+          {% if e.note %}<p class="edu-note">{{ e.note }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if academicAwards.length %}
+      <div class="edu-scholarships">
+        <h3 class="edu-scholarships__heading">Scholarships &amp; Academic Honors</h3>
+        <ul class="edu-scholarships__list" role="list">
+          {% for a in academicAwards %}
+          <li class="edu-scholarship">
+            <span class="edu-scholarship__title">{{ a.title }}</span>
+            <span class="edu-scholarship__meta">{{ a.eventName }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- Organizations -->
+    <section id="organizations" aria-label="Organizations">
+      <div class="section-head">
+        <span class="section-head__num">07 —</span>
+        <h2 class="section-head__title">ORGANIZATIONS</h2>
+      </div>
+      <div class="org-list">
+        {% for org in organizations.items | orgNormalizeSort %}
+        <article class="org-entry">
+          <h3 class="org-entry__role">{{ org.role }}</h3>
+          <p class="org-entry__org">{{ org.organization }}</p>
+          <p class="org-entry__date">{{ org | orgRange }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" aria-label="Contact">
+      <div class="section-head">
+        <span class="section-head__num">08 —</span>
+        <h2 class="section-head__title">CONTACT</h2>
+      </div>
+      <ul class="contact-links" role="list">
+        <li>
+          <a href="mailto:{{ site.email }}" class="contact-link" aria-label="Send email to {{ site.email }}">
+            <span class="contact-link__label">Email</span>
+            <span class="contact-link__value">{{ site.email }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ site.linkedin }}" class="contact-link" target="_blank" rel="noopener noreferrer" aria-label="Visit Delta's LinkedIn profile">
+            <span class="contact-link__label">LinkedIn</span>
+            <span class="contact-link__value">{{ site.linkedin | replace('https://', '') }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ site.github }}" class="contact-link" target="_blank" rel="noopener noreferrer" aria-label="Visit Delta's GitHub profile">
+            <span class="contact-link__label">GitHub</span>
+            <span class="contact-link__value">{{ site.github | replace('https://', '') }}</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="foot-letter" role="contentinfo">
+    <p class="foot-letter__close">{{ site.footer.line }}<br><span class="foot-letter__sign">{{ site.footer.sign }}</span></p>
+  </footer>
+
+  <!-- Lightbox — opened by clicking a zoomable project image (JS-enhanced). -->
+  <div class="lightbox" id="lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button type="button" class="lightbox__close" data-lightbox-close aria-label="Close image viewer">×</button>
+    <img class="lightbox__img" id="lightbox-img" src="" alt="">
+  </div>
+
+  <script src="scripts/main.js" defer></script>
+</body>
+</html>

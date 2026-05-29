@@ -1,0 +1,12 @@
+node_modules/
+_site/
+.cache/
+.DS_Store
+*.log
+
+# AI tooling — specs, skills, agent config (not part of the deployed site)
+.kiro/
+.agents/
+
+# Editor settings (personal)
+.vscode/

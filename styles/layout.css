@@ -1,0 +1,178 @@
+/* ==========================================================================
+   Layout — Reset, Grid System, Responsive Breakpoints, Fluid Typography
+   Specimen macrostructure: numbered section headers, generous editorial space
+   ========================================================================== */
+
+/* --- CSS Reset / Normalize --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  /* Offset anchored jumps so the sticky nav doesn't cover section titles. */
+  scroll-padding-top: var(--nav-offset, 6rem);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: clip;
+  min-height: 100vh;
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-body, 400);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  /* Smooth theme switch — guarded by reduced-motion below */
+  transition: background-color var(--duration-normal) var(--easing-default),
+              color var(--duration-normal) var(--easing-default);
+}
+
+/* --- Fluid Typography --- */
+body {
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  /* min 16px → max 18px */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 4rem); }      /* 36 → 64px */
+h2 { font-size: clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem); }/* 24 → 36px */
+h3 { font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem); }/* 20 → 28px */
+h4, h5, h6 { font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem); }
+
+/* --- Base Element Resets --- */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration-skip-ink: auto;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* --- Overflow Protection for Narrow Viewports (240–319px) --- */
+body {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* --- Page Layout — single centered content column (Specimen, editorial) --- */
+main {
+  display: block;
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+/* Each section is a stacked block; rhythm comes from generous vertical gaps */
+main > section {
+  padding-block: var(--space-2xl);
+  /* Anchored jumps land below the sticky nav, showing the section title. */
+  scroll-margin-top: var(--nav-offset, 6rem);
+}
+
+main > section:first-child {
+  padding-top: var(--space-lg);
+}
+
+/* --- Tablet Breakpoint (≥768px) --- */
+@media (min-width: 768px) {
+  main {
+    padding-inline: var(--space-xl);
+  }
+
+  main > section {
+    padding-block: var(--space-3xl);
+  }
+}
+
+/* --- Desktop Breakpoint (≥1024px) --- */
+@media (min-width: 1024px) {
+  main {
+    padding-inline: var(--space-2xl);
+  }
+}
+
+/* --- Header / Navigation Layout --- */
+.nav-edge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--space-md);
+  padding-block: var(--space-sm);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .nav-edge { padding-inline: var(--space-xl); }
+}
+
+@media (min-width: 1024px) {
+  .nav-edge { padding-inline: var(--space-2xl); }
+}
+
+/* --- Footer Layout --- */
+footer {
+  padding-inline: var(--space-md);
+  padding-block: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+  footer { padding-inline: var(--space-xl); }
+}
+
+@media (min-width: 1024px) {
+  footer { padding-inline: var(--space-2xl); }
+}
+
+/* --- Accessibility: Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  body { transition: none; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "deltarfd-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal portfolio for Delta Rahmat Fajar Delviansyah",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "eleventy --serve",
+    "build": "eleventy",
+    "admin": "eleventy && node scripts/admin-server.mjs"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.5",
+    "axe-core": "^4.11.4",
+    "fast-check": "3.23.2",
+    "jsdom": "^29.1.1",
+    "vitest": "2.1.8"
+  }
+}
