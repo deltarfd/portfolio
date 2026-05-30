@@ -15,13 +15,16 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync, statS
 import { resolve, extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { execFile } from 'node:child_process';
+import { execFile, exec } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const execAsync = promisify(exec);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const contentRoot = resolve(root, 'src', 'content');
 const siteFile = resolve(root, 'src', '_data', 'site.json');
-const PORT = 8888;
+const PORT = process.env.PORT || 8888;
 
 const COLLECTIONS = ['experience', 'projects', 'skills', 'certifications', 'awards', 'organizations', 'education'];
 
@@ -65,6 +68,25 @@ function rebuild() {
     else console.log('[admin] site rebuilt');
   });
 }
+
+async function gitSync(message) {
+  if (process.env.NODE_ENV !== 'production') return;
+  try {
+    if (process.env.GIT_REMOTE_URL) {
+      await execAsync(`git remote set-url origin ${process.env.GIT_REMOTE_URL}`);
+    }
+    await execAsync('git config user.name "Admin Bot"');
+    await execAsync('git config user.email "admin-bot@example.com"');
+    await execAsync('git add .');
+    await execAsync(`git commit -m "${message}"`);
+    await execAsync('git push origin HEAD');
+    console.log('[admin] Git sync successful');
+  } catch (e) {
+    if (e.message.includes('nothing to commit')) return;
+    console.error('[admin] Git sync failed:', e.message);
+  }
+}
+
 
 /**
  * Ensure each skill name used by an entry exists in the Skills collection.
@@ -131,6 +153,12 @@ function serveStatic(req, res, urlPath) {
     target = normalize(join(root, 'src', rel));
   } else if (rel.startsWith('/assets/media/')) {
     target = normalize(join(root, 'src', 'content', 'media', rel.replace(/^\/assets\/media\//, '')));
+  } else {
+    // Serve from _site by default for public web
+    target = normalize(join(root, '_site', rel));
+    if (existsSync(target) && statSync(target).isDirectory()) {
+      target = join(target, 'index.html');
+    }
   }
   if (!existsSync(target) || statSync(target).isDirectory()) { res.writeHead(404); res.end('Not found'); return; }
   const type = MIME[extname(target)] || 'application/octet-stream';
@@ -154,6 +182,7 @@ const server = createServer(async (req, res) => {
         const body = await readBody(req);
         writeFileSync(siteFile, JSON.stringify(body.data, null, 2) + '\n', 'utf-8');
         rebuild();
+        await gitSync('Update site settings');
         return sendJson(res, 200, { ok: true });
       }
 
@@ -168,6 +197,7 @@ const server = createServer(async (req, res) => {
         const skillField = SKILL_FIELD[collection];
         if (skillField && Array.isArray(data[skillField])) addedSkills = ensureSkills(data[skillField]);
         rebuild();
+        await gitSync(`Add/Update entry in ${collection}: ${name}`);
         return sendJson(res, 200, { ok: true, slug: name, addedSkills });
       }
 
@@ -186,6 +216,7 @@ const server = createServer(async (req, res) => {
         const assetsDir = resolve(root, 'assets');
         writeFileSync(resolve(assetsDir, safeName), Buffer.from(m[2], 'base64'));
         rebuild();
+        await gitSync('Upload profile image');
         return sendJson(res, 200, { ok: true, path: 'assets/' + safeName });
       }
 
@@ -197,6 +228,7 @@ const server = createServer(async (req, res) => {
           if (existsSync(fp)) { try { unlinkSync(fp); } catch (e) { /* ignore */ } }
         }
         rebuild();
+        await gitSync('Delete profile image');
         return sendJson(res, 200, { ok: true });
       }
 
@@ -218,6 +250,7 @@ const server = createServer(async (req, res) => {
         if (!existsSync(mediaDir)) mkdirSync(mediaDir, { recursive: true });
         writeFileSync(resolve(mediaDir, unique), Buffer.from(m[2], 'base64'));
         rebuild();
+        await gitSync(`Upload media: ${unique}`);
         return sendJson(res, 200, { ok: true, path: 'assets/media/' + unique });
       }
 
@@ -228,6 +261,7 @@ const server = createServer(async (req, res) => {
         const file = resolve(dir, safeSlug(slug) + '.json');
         if (existsSync(file)) unlinkSync(file);
         rebuild();
+        await gitSync(`Delete entry from ${collection}: ${slug}`);
         return sendJson(res, 200, { ok: true });
       }
 
@@ -249,6 +283,7 @@ const server = createServer(async (req, res) => {
           }
         });
         rebuild();
+        await gitSync(`Reorder collection: ${collection}`);
         return sendJson(res, 200, { ok: true, written });
       }
 

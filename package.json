@@ -9,7 +9,8 @@
     "test:watch": "vitest",
     "dev": "eleventy --serve",
     "build": "eleventy",
-    "admin": "eleventy && node scripts/admin-server.mjs"
+    "admin": "eleventy && node scripts/admin-server.mjs",
+    "start": "eleventy && NODE_ENV=production node scripts/admin-server.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.5",
