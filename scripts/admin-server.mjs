@@ -26,7 +26,7 @@ const contentRoot = resolve(root, 'src', 'content');
 const siteFile = resolve(root, 'src', 'content', 'site.json');
 const PORT = process.env.PORT || 8888;
 
-const COLLECTIONS = ['experience', 'projects', 'skills', 'certifications', 'awards', 'organizations', 'education'];
+const COLLECTIONS = ['experience', 'projects', 'skills', 'certifications', 'awards', 'organizations', 'education', 'socials'];
 
 // Which field on each collection carries skill names (for auto-registration).
 const SKILL_FIELD = { experience: 'technologies', projects: 'tech', certifications: 'skills' };

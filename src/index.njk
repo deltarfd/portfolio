@@ -362,23 +362,22 @@ permalink: /index.html
           youtube: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>',
           medium: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42zm2.81 0c0 3.13-.53 5.67-1.18 5.67-.66 0-1.18-2.54-1.18-5.67 0-3.14.52-5.67 1.18-5.67.65 0 1.18 2.53 1.18 5.67z"/></svg>'
         } %}
-        {% set socials = [
-          { id: 'email', key: site.email, type: 'email', label: 'Email', prefix: 'mailto:' },
-          { id: 'linkedin', key: site.linkedin, type: 'url', label: 'LinkedIn' },
-          { id: 'github', key: site.github, type: 'url', label: 'GitHub' },
-          { id: 'twitter', key: site.twitter, type: 'url', label: 'Twitter' },
-          { id: 'instagram', key: site.instagram, type: 'url', label: 'Instagram' },
-          { id: 'youtube', key: site.youtube, type: 'url', label: 'YouTube' },
-          { id: 'medium', key: site.medium, type: 'url', label: 'Medium' }
-        ] %}
+        
         {% for s in socials %}
-          {% if s.key %}
+          {% if s.url %}
           <li>
-            <a href="{% if s.type == 'email' %}{{ s.prefix }}{% endif %}{{ s.key }}" class="contact-link" {% if s.type == 'url' %}target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Visit {{ s.label }}">
-              <div class="contact-link__icon">{{ icons[s.id] | safe }}</div>
+            <a href="{{ s.url }}" class="contact-link" {% if s.platform != 'Email' %}target="_blank" rel="noopener noreferrer"{% endif %} aria-label="Visit {{ s.platform }}">
+              <div class="contact-link__icon">
+                {% set plat = s.platform | lower %}
+                {% if icons[plat] %}
+                  {{ icons[plat] | safe }}
+                {% else %}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                {% endif %}
+              </div>
               <div class="contact-link__content">
-                <span class="contact-link__label">{{ s.label }}</span>
-                <span class="contact-link__value">{% if s.type == 'email' %}{{ s.key }}{% else %}{{ s.key | replace('https://', '') | replace('http://', '') | replace('www.', '') }}{% endif %}</span>
+                <span class="contact-link__label">{{ s.platform }}</span>
+                <span class="contact-link__value">{{ s.label }}</span>
               </div>
             </a>
           </li>

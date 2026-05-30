@@ -5,6 +5,19 @@ const API = '';
 
 // ── Field schemas (mirror the data shapes) ───────────────────────────────
 const SCHEMAS = {
+  socials: {
+    label: 'Contact & Socials', singular: 'Link',
+    title: (d) => d.platform || 'New Link', meta: (d) => d.label || d.url,
+    slug: (d) => `${String(d.order ?? 1).padStart(2, '0')}-${slugify(d.platform)}`,
+    sortKey: (d) => String(d.order ?? 99).padStart(4, '0'),
+    fields: [
+      { name: 'order', label: 'Order', type: 'number', default: 1, hint: 'Lower numbers appear first.' },
+      { name: 'platform', label: 'Platform', type: 'select', options: ['Email', 'LinkedIn', 'GitHub', 'Twitter', 'Instagram', 'YouTube', 'Medium', 'Other'] },
+      { name: 'label', label: 'Display Label', type: 'text', hint: 'What the user sees (e.g. deltarfd@live.com or github.com/deltarfd)' },
+      { name: 'url', label: 'URL / Link', type: 'text', hint: 'The actual link (e.g. mailto:deltarfd@live.com or https://github.com/deltarfd)' }
+    ],
+  },
+
   site: {
     label: 'Site & Profile',
     single: true,
@@ -19,10 +32,6 @@ const SCHEMAS = {
       { name: 'metaDescription', label: 'Meta description', type: 'textarea', hint: 'Used by search engines and social shares.' },
       { name: 'email', label: 'Email', type: 'text' },
       { name: 'linkedin', label: 'LinkedIn URL', type: 'text' },
-            { name: 'github', label: 'GitHub URL', type: 'text' },
-      { name: 'twitter', label: 'Twitter / X URL', type: 'text' },
-      { name: 'instagram', label: 'Instagram URL', type: 'text' },
-      { name: 'youtube', label: 'YouTube URL', type: 'text' },
       { name: 'medium', label: 'Medium URL', type: 'text' },
       { name: 'footer.line', label: 'Footer — Closing line', type: 'text' },
       { name: 'footer.sign', label: 'Footer — Signature', type: 'text' },
