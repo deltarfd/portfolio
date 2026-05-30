@@ -249,11 +249,15 @@ function status(msg, kind) {
   if (msg && kind === 'ok') setTimeout(() => { if (el.textContent === msg) { el.textContent = ''; el.className = 'adm-status'; } }, 2500);
 }
 async function api(path, method, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  const auth = localStorage.getItem('adm_auth');
+  if (auth) headers['Authorization'] = 'Basic ' + auth;
   const res = await fetch(API + path, {
     method: method || 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
+  if (res.status === 401) throw new Error('401');
   if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
   return res.json();
 }
@@ -785,7 +789,9 @@ function renderImageField(f, value, onChange) {
     const preview = el('div', { class: 'adm-image-preview' });
     if (currentPath) {
       // cache-bust so a re-upload shows immediately
-      preview.append(el('img', { src: '/' + currentPath + '?t=' + Date.now(), alt: 'Profile preview' }));
+      const img = el('img', { src: '/' + currentPath + '?t=' + Date.now(), alt: 'Profile preview' });
+      img.onerror = () => { img.style.display = 'none'; };
+      preview.append(img);
     } else {
       preview.append(el('span', { class: 'adm-image-empty' }, 'No photo yet'));
     }
@@ -1078,13 +1084,56 @@ document.getElementById('adm-theme').addEventListener('click', () => {
 
 // ── Boot ────────────────────────────────────────────────────────────────
 (async function boot() {
-  const onAdminServer = location.port === '8888';
+  const onAdminServer = location.port === '8888' || location.host.includes('render.com') || location.host.includes('railway.app') || location.host.includes('localhost');
+  
+  function renderLogin() {
+    const main = document.getElementById('adm-main');
+    document.getElementById('adm-nav').innerHTML = '';
+    
+    const form = el('form', { class: 'adm-form', onsubmit: async (e) => {
+      e.preventDefault();
+      const user = document.getElementById('l-user').value || 'admin';
+      const pass = document.getElementById('l-pass').value;
+      localStorage.setItem('adm_auth', btoa(user + ':' + pass));
+      try {
+        await load();
+        render();
+      } catch (err) {
+        if (err.message === '401') status('Incorrect password', 'err');
+        else status('Error: ' + err.message, 'err');
+      }
+    } });
+
+    form.append(el('div', { class: 'adm-head adm-head--form' }, 
+      el('h1', {}, 'Admin Login')
+    ));
+    
+    const fieldUser = el('div', { class: 'adm-field' },
+      el('label', { for: 'l-user' }, 'Username'),
+      el('input', { type: 'text', id: 'l-user', placeholder: 'admin' })
+    );
+    const fieldPass = el('div', { class: 'adm-field' },
+      el('label', { for: 'l-pass' }, 'Password'),
+      el('input', { type: 'password', id: 'l-pass', required: true })
+    );
+    
+    form.append(fieldUser, fieldPass);
+    form.append(el('div', { class: 'adm-form__actions' },
+      el('button', { type: 'submit', class: 'btn btn--primary' }, 'Log In')
+    ));
+    
+    main.innerHTML = '';
+    main.append(form);
+  }
+
   try {
     await load();
     render();
   } catch (e) {
     const main = document.getElementById('adm-main');
-    if (!onAdminServer) {
+    if (e.message === '401') {
+      renderLogin();
+    } else if (!onAdminServer) {
       main.innerHTML =
         '<div class="adm-form"><h1 style="font-family:var(--font-display);font-style:italic">Open the admin from the right server</h1>' +
         '<p class="adm-head__sub">This page is being served from <code>' + location.host + '</code>, which has no editing API.</p>' +

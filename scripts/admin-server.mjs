@@ -189,10 +189,9 @@ const server = createServer(async (req, res) => {
   const { url, method, headers } = req;
 
   // ── Authentication ─────────────────────────────────────────────────────
-  if (process.env.ADMIN_PASSWORD && (url.startsWith('/admin') || url.startsWith('/api/'))) {
+  if (process.env.ADMIN_PASSWORD && url.startsWith('/api/')) {
     const auth = headers.authorization;
     if (!auth || auth.indexOf('Basic ') !== 0) {
-      res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel"');
       res.writeHead(401);
       res.end('Unauthorized');
       return;
@@ -203,7 +202,6 @@ const server = createServer(async (req, res) => {
     
     const expectedUser = process.env.ADMIN_USERNAME || 'admin';
     if (username !== expectedUser || password !== process.env.ADMIN_PASSWORD) {
-      res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel"');
       res.writeHead(401);
       res.end('Unauthorized');
       return;

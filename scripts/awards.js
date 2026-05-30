@@ -7,13 +7,14 @@
  *   category:  'competition' | 'academic'
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 function loadAwardData() {
   const here = dirname(fileURLToPath(import.meta.url));
   const dir = resolve(here, '..', 'src', 'content', 'awards');
+  if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((f) => f.endsWith('.json'))
     .sort()
