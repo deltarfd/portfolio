@@ -173,9 +173,9 @@ textarea.is-success {
 }
 
 /* --------------------------------------------------------------------------
-   Hero Section
+   Profile Section
    -------------------------------------------------------------------------- */
-.hero {
+.profile {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -183,16 +183,16 @@ textarea.is-success {
   text-align: center;
 }
 
-#hero {
+#profile {
   border-top: none;
 }
 
 /* Photo column */
-.hero__photo-col {
+.profile__photo-col {
   flex-shrink: 0;
 }
 
-.hero__photo-wrapper {
+.profile__photo-wrapper {
   display: block;
   width: 120px;
   height: 120px;
@@ -203,7 +203,7 @@ textarea.is-success {
   box-shadow: 0 0 0 6px var(--color-paper-2);
 }
 
-.hero__photo-wrapper--fallback {
+.profile__photo-wrapper--fallback {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,7 +211,7 @@ textarea.is-success {
   border: 1px solid var(--color-rule);
 }
 
-.hero__photo-wrapper--fallback::after {
+.profile__photo-wrapper--fallback::after {
   content: "";
   display: block;
   width: 40%;
@@ -220,7 +220,7 @@ textarea.is-success {
   background-color: var(--color-rule);
 }
 
-.hero__photo {
+.profile__photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -228,7 +228,7 @@ textarea.is-success {
 }
 
 /* Placeholder when no photo has been uploaded yet */
-.hero__photo-placeholder {
+.profile__photo-placeholder {
   display: flex;
   width: 100%;
   height: 100%;
@@ -236,7 +236,7 @@ textarea.is-success {
   justify-content: center;
   background-color: var(--color-paper-3);
 }
-.hero__photo-placeholder::after {
+.profile__photo-placeholder::after {
   content: "";
   display: block;
   width: 40%;
@@ -246,11 +246,11 @@ textarea.is-success {
 }
 
 /* Text column */
-.hero__text-col {
+.profile__text-col {
   text-align: center;
 }
 
-.hero__eyebrow {
+.profile__eyebrow {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -262,7 +262,7 @@ textarea.is-success {
   margin-bottom: var(--space-4);
 }
 
-.hero__eyebrow::before {
+.profile__eyebrow::before {
   content: "";
   width: 0.5rem;
   height: 0.5rem;
@@ -270,7 +270,7 @@ textarea.is-success {
   background-color: var(--color-accent);
 }
 
-.hero__name {
+.profile__name {
   font-family: var(--font-display);
   font-size: clamp(2.25rem, 1.6rem + 3vw, 4rem);
   font-weight: var(--weight-semibold);
@@ -282,7 +282,7 @@ textarea.is-success {
   text-wrap: balance;
 }
 
-.hero__title {
+.profile__title {
   font-family: var(--font-body);
   font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
   font-weight: var(--weight-regular);
@@ -292,7 +292,7 @@ textarea.is-success {
   margin-bottom: var(--space-6);
 }
 
-.hero__summary {
+.profile__summary {
   font-family: var(--font-body);
   font-size: var(--font-size-md);
   line-height: var(--leading-relaxed);
@@ -301,9 +301,9 @@ textarea.is-success {
   margin-inline: auto;
 }
 
-/* Hero — Tablet+ (≥768px): photo left, text right, left-aligned */
+/* Profile — Tablet+ (≥768px): photo left, text right, left-aligned */
 @media (min-width: 768px) {
-  .hero {
+  .profile {
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
@@ -311,7 +311,7 @@ textarea.is-success {
     text-align: left;
   }
 
-  .hero > .hero__photo-col {
+  .profile > .profile__photo-col {
     grid-column: 1;
     grid-row: 1;
     display: flex;
@@ -319,25 +319,25 @@ textarea.is-success {
     align-items: center;
   }
 
-  .hero__photo-wrapper {
+  .profile__photo-wrapper {
     width: 168px;
     height: 168px;
   }
 
-  .hero > .hero__text-col {
+  .profile > .profile__text-col {
     grid-column: 2;
     grid-row: 1;
     text-align: left;
   }
 
-  .hero__summary {
+  .profile__summary {
     margin-inline: 0;
   }
 }
 
-/* Hero — Desktop (≥1024px): larger photo */
+/* Profile — Desktop (≥1024px): larger photo */
 @media (min-width: 1024px) {
-  .hero__photo-wrapper {
+  .profile__photo-wrapper {
     width: 200px;
     height: 200px;
   }
@@ -991,7 +991,7 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   Sticky Navigation — activates after scrolling past hero
+   Sticky Navigation — activates after scrolling past profile
    -------------------------------------------------------------------------- */
 .nav-edge {
   position: sticky;

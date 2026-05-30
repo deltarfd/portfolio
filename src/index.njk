@@ -36,6 +36,7 @@ permalink: /index.html
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+  <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/layout.css">
   <link rel="stylesheet" href="styles/components.css">
@@ -46,10 +47,10 @@ permalink: /index.html
 
   <header class="nav-edge" role="banner">
     <nav aria-label="Primary navigation" role="navigation">
-      <a href="#hero" class="nav-wordmark">{{ site.wordmark }}</a>
+      <a href="#profile" class="nav-wordmark">{{ site.wordmark }}</a>
 
       <ul class="nav-links" id="nav-links" role="list">
-        <li><a href="#hero" class="nav-link" data-section="hero">About</a></li>
+        <li><a href="#profile" class="nav-link" data-section="profile">About</a></li>
         <li><a href="#experience" class="nav-link" data-section="experience">Experience</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
         <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
@@ -80,7 +81,7 @@ permalink: /index.html
 
       <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
         <ul class="nav-overlay__links" role="list">
-          <li><a href="#hero" class="nav-overlay__link" data-section="hero">About</a></li>
+          <li><a href="#profile" class="nav-overlay__link" data-section="profile">About</a></li>
           <li><a href="#experience" class="nav-overlay__link" data-section="experience">Experience</a></li>
           <li><a href="#projects" class="nav-overlay__link" data-section="projects">Projects</a></li>
           <li><a href="#skills" class="nav-overlay__link" data-section="skills">Skills</a></li>
@@ -95,23 +96,23 @@ permalink: /index.html
   </header>
 
   <main id="main-content">
-    <!-- Hero -->
-    <section id="hero" aria-label="Introduction" class="hero">
-      <div class="hero__photo-col">
-        <picture class="hero__photo-wrapper">
+    <!-- Profile -->
+    <section id="profile" aria-label="Introduction" class="profile">
+      <div class="profile__photo-col">
+        <picture class="profile__photo-wrapper">
           {% if site.photo %}
-          <img src="/{{ site.photo }}" alt="{{ site.photoAlt }}" class="hero__photo" width="240" height="240" loading="eager"
-            onerror="this.parentElement.classList.add('hero__photo-wrapper--fallback'); this.style.display='none';">
+          <img src="/{{ site.photo }}" alt="{{ site.photoAlt }}" class="profile__photo" width="240" height="240" loading="eager"
+            onerror="this.parentElement.classList.add('profile__photo-wrapper--fallback'); this.style.display='none';">
           {% else %}
-          <span class="hero__photo-placeholder" aria-hidden="true"></span>
+          <span class="profile__photo-placeholder" aria-hidden="true"></span>
           {% endif %}
         </picture>
       </div>
-      <div class="hero__text-col">
-        <span class="hero__eyebrow">{{ site.eyebrow }}</span>
-        <h1 class="hero__name">{{ site.name }}</h1>
-        <h2 class="hero__title">{{ site.title }}</h2>
-        <p class="hero__summary">{{ site.summary }}</p>
+      <div class="profile__text-col">
+        <span class="profile__eyebrow">{{ site.eyebrow }}</span>
+        <h1 class="profile__name">{{ site.name }}</h1>
+        <h2 class="profile__title">{{ site.title }}</h2>
+        <p class="profile__summary">{{ site.summary }}</p>
       </div>
     </section>
 
@@ -352,24 +353,25 @@ permalink: /index.html
         <h2 class="section-head__title">CONTACT</h2>
       </div>
       <ul class="contact-links" role="list">
-        <li>
-          <a href="mailto:{{ site.email }}" class="contact-link" aria-label="Send email to {{ site.email }}">
-            <span class="contact-link__label">Email</span>
-            <span class="contact-link__value">{{ site.email }}</span>
-          </a>
-        </li>
-        <li>
-          <a href="{{ site.linkedin }}" class="contact-link" target="_blank" rel="noopener noreferrer" aria-label="Visit Delta's LinkedIn profile">
-            <span class="contact-link__label">LinkedIn</span>
-            <span class="contact-link__value">{{ site.linkedin | replace('https://', '') }}</span>
-          </a>
-        </li>
-        <li>
-          <a href="{{ site.github }}" class="contact-link" target="_blank" rel="noopener noreferrer" aria-label="Visit Delta's GitHub profile">
-            <span class="contact-link__label">GitHub</span>
-            <span class="contact-link__value">{{ site.github | replace('https://', '') }}</span>
-          </a>
-        </li>
+        {% set socials = [
+          { key: site.email, type: 'email', label: 'Email', prefix: 'mailto:' },
+          { key: site.linkedin, type: 'url', label: 'LinkedIn' },
+          { key: site.github, type: 'url', label: 'GitHub' },
+          { key: site.twitter, type: 'url', label: 'Twitter' },
+          { key: site.instagram, type: 'url', label: 'Instagram' },
+          { key: site.youtube, type: 'url', label: 'YouTube' },
+          { key: site.medium, type: 'url', label: 'Medium' }
+        ] %}
+        {% for s in socials %}
+          {% if s.key %}
+          <li>
+            <a href="{% if s.type == 'email' %}{{ s.prefix }}{% endif %}{{ s.key }}" class="contact-link" {% if s.type == 'url' %}target="_blank" rel="noopener noreferrer"{% endif %} aria-label="{{ s.label }}">
+              <span class="contact-link__label">{{ s.label }}</span>
+              <span class="contact-link__value">{% if s.type == 'email' %}{{ s.key }}{% else %}{{ s.key | replace('https://', '') | replace('http://', '') | replace('www.', '') }}{% endif %}</span>
+            </a>
+          </li>
+          {% endif %}
+        {% endfor %}
       </ul>
     </section>
   </main>

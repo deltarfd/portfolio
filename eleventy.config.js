@@ -23,6 +23,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ 'scripts/main.js': 'scripts/main.js' });
   eleventyConfig.addPassthroughCopy({ 'src/content/media': 'assets/media' });
   eleventyConfig.addPassthroughCopy({ 'src/admin': 'admin' });
+  eleventyConfig.addPassthroughCopy({ 'src/favicon.png': 'favicon.png' });
 
   // ── Projects ───────────────────────────────────────────────────────────
   eleventyConfig.addFilter('sortProjects', (list) => sortProjects(list || []));

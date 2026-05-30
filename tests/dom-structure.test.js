@@ -10,28 +10,28 @@ beforeAll(() => {
   document = dom.window.document;
 });
 
-describe('Hero Section', () => {
+describe('Profile Section', () => {
   it('contains an h1 with the full name', () => {
-    const h1 = document.querySelector('#hero h1');
+    const h1 = document.querySelector('#profile h1');
     expect(h1).not.toBeNull();
     expect(h1.textContent).toBe('Delta Rahmat Fajar Delviansyah');
   });
 
   it('contains a professional title as h2', () => {
-    const h2 = document.querySelector('#hero h2');
+    const h2 = document.querySelector('#profile h2');
     expect(h2).not.toBeNull();
     expect(h2.textContent).toBe('Tech Enthusiast | Mobile Developer / Engineer');
   });
 
   it('contains a professional summary paragraph', () => {
-    const summary = document.querySelector('#hero .hero__summary');
+    const summary = document.querySelector('#profile .profile__summary');
     expect(summary).not.toBeNull();
     expect(summary.textContent.length).toBeLessThanOrEqual(280);
     expect(summary.textContent).toMatch(/\d+/); // contains numeric value
   });
 
   it('has an aria-label on the section', () => {
-    const section = document.querySelector('#hero');
+    const section = document.querySelector('#profile');
     expect(section.getAttribute('aria-label')).toBeTruthy();
   });
 });
@@ -45,7 +45,7 @@ describe('Navigation', () => {
 
   it('has links to all 9 sections', () => {
     const expectedSections = [
-      'hero', 'experience', 'projects', 'skills', 'certifications',
+      'profile', 'experience', 'projects', 'skills', 'certifications',
       'awards', 'education', 'organizations', 'contact'
     ];
     const navLinks = document.querySelectorAll('.nav-links .nav-link');
@@ -73,15 +73,15 @@ describe('Section Order', () => {
     const sections = Array.from(main.querySelectorAll(':scope > section'));
     const sectionIds = sections.map(s => s.id);
     expect(sectionIds).toEqual([
-      'hero', 'experience', 'projects', 'skills', 'certifications',
+      'profile', 'experience', 'projects', 'skills', 'certifications',
       'awards', 'education', 'organizations', 'contact'
     ]);
   });
 
-  it('hero is the first section', () => {
+  it('profile is the first section', () => {
     const main = document.querySelector('main');
     const firstSection = main.querySelector(':scope > section');
-    expect(firstSection.id).toBe('hero');
+    expect(firstSection.id).toBe('profile');
   });
 
   it('contact is the last section before footer', () => {
