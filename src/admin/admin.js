@@ -349,6 +349,24 @@ function sortedFiltered(schema, key) {
   } else if (st.sort === 'za') {
     rows.sort((a, b) => String(schema.title(b.data)).localeCompare(String(schema.title(a.data))));
   }
+  
+  // Always push hidden/expired items to the very bottom, keeping previous sort order
+  rows.sort((a, b) => {
+    const isHide = (d) => {
+      if (d.hidden) return true;
+      if (d.expiration) {
+        const [y, m] = d.expiration.split('-');
+        if (y && m && new Date(y, m - 1, 1) < new Date()) return true;
+      }
+      return false;
+    };
+    const hA = isHide(a.data);
+    const hB = isHide(b.data);
+    if (hA && !hB) return 1;
+    if (!hA && hB) return -1;
+    return 0;
+  });
+
   return rows;
 }
 

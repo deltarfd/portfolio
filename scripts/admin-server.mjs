@@ -62,11 +62,30 @@ function readCollection(collection) {
     .map((f) => ({ slug: f.replace(/\.json$/, ''), data: JSON.parse(readFileSync(resolve(dir, f), 'utf-8')) }));
 }
 
+let rebuildTimer = null;
+let isRebuilding = false;
+let rebuildPending = false;
+
 function rebuild() {
-  execFile('npx', ['@11ty/eleventy'], { cwd: root, shell: true }, (err) => {
-    if (err) console.error('[admin] rebuild failed:', err.message);
-    else console.log('[admin] site rebuilt');
-  });
+  if (isRebuilding) {
+    rebuildPending = true;
+    return;
+  }
+  
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(() => {
+    isRebuilding = true;
+    execFile('npx', ['@11ty/eleventy'], { cwd: root, shell: true }, (err) => {
+      isRebuilding = false;
+      if (err) console.error('[admin] rebuild failed:', err.message);
+      else console.log('[admin] site rebuilt');
+      
+      if (rebuildPending) {
+        rebuildPending = false;
+        rebuild();
+      }
+    });
+  }, 500);
 }
 
 async function gitSync(message) {
