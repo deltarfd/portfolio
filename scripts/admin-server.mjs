@@ -72,17 +72,36 @@ function rebuild() {
 async function gitSync(message) {
   if (process.env.NODE_ENV !== 'production') return;
   try {
-    if (process.env.GIT_REMOTE_URL) {
-      await execAsync(`git remote set-url origin ${process.env.GIT_REMOTE_URL}`);
+    // 1. Sync Content Submodule (src/content)
+    const contentDir = resolve(root, 'src', 'content');
+    if (existsSync(join(contentDir, '.git'))) {
+      if (process.env.CONTENT_GIT_REMOTE_URL) {
+        await execAsync(`git remote set-url origin ${process.env.CONTENT_GIT_REMOTE_URL}`, { cwd: contentDir });
+      }
+      await execAsync('git config user.name "Admin Bot"', { cwd: contentDir });
+      await execAsync('git config user.email "admin-bot@example.com"', { cwd: contentDir });
+      await execAsync('git add .', { cwd: contentDir });
+      try {
+        await execAsync(`git commit -m "${message}"`, { cwd: contentDir });
+        await execAsync('git push origin HEAD', { cwd: contentDir });
+        console.log('[admin] Content Git sync successful');
+      } catch (e) { /* ignore nothing to commit */ }
     }
-    await execAsync('git config user.name "Admin Bot"');
-    await execAsync('git config user.email "admin-bot@example.com"');
-    await execAsync('git add .');
-    await execAsync(`git commit -m "${message}"`);
-    await execAsync('git push origin HEAD');
-    console.log('[admin] Git sync successful');
+
+    // 2. Sync Main Repository (for site.json and submodule reference)
+    if (process.env.MAIN_GIT_REMOTE_URL) {
+      await execAsync(`git remote set-url origin ${process.env.MAIN_GIT_REMOTE_URL}`, { cwd: root });
+    }
+    await execAsync('git config user.name "Admin Bot"', { cwd: root });
+    await execAsync('git config user.email "admin-bot@example.com"', { cwd: root });
+    await execAsync('git add src/_data/site.json src/content', { cwd: root });
+    try {
+      await execAsync(`git commit -m "${message}"`, { cwd: root });
+      await execAsync('git push origin HEAD', { cwd: root });
+      console.log('[admin] Main Git sync successful');
+    } catch (e) { /* ignore nothing to commit */ }
+
   } catch (e) {
-    if (e.message.includes('nothing to commit')) return;
     console.error('[admin] Git sync failed:', e.message);
   }
 }
@@ -144,7 +163,7 @@ function readBody(req) {
 function serveStatic(req, res, urlPath) {
   // Map URL to a file within the project root, with traversal protection.
   let rel = decodeURIComponent(urlPath.split('?')[0]);
-  if (rel === '/' || rel === '/admin' || rel === '/admin/') rel = '/admin/index.html';
+  if (rel === '/admin' || rel === '/admin/') rel = '/admin/index.html';
   const filePath = normalize(join(root, rel));
   if (!filePath.startsWith(root)) { res.writeHead(403); res.end('Forbidden'); return; }
   // Prefer src/admin for /admin/* so we serve the source admin app directly.
@@ -167,7 +186,29 @@ function serveStatic(req, res, urlPath) {
 }
 
 const server = createServer(async (req, res) => {
-  const { url, method } = req;
+  const { url, method, headers } = req;
+
+  // ── Authentication ─────────────────────────────────────────────────────
+  if (process.env.ADMIN_PASSWORD && (url.startsWith('/admin') || url.startsWith('/api/'))) {
+    const auth = headers.authorization;
+    if (!auth || auth.indexOf('Basic ') !== 0) {
+      res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel"');
+      res.writeHead(401);
+      res.end('Unauthorized');
+      return;
+    }
+    const base64Credentials = auth.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const [username, password] = credentials.split(':');
+    
+    const expectedUser = process.env.ADMIN_USERNAME || 'admin';
+    if (username !== expectedUser || password !== process.env.ADMIN_PASSWORD) {
+      res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel"');
+      res.writeHead(401);
+      res.end('Unauthorized');
+      return;
+    }
+  }
 
   // ── API ──────────────────────────────────────────────────────────────
   if (url.startsWith('/api/')) {
