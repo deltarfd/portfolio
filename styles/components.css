@@ -374,13 +374,12 @@ textarea.is-success {
 
 .chip-list.cert-entry__skills {
   margin-top: 0.35rem;
-  gap: var(--space-1);
 }
 
 .chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: 0.35rem;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -685,7 +684,8 @@ a {
   padding: var(--space-md) 0;
 }
 
-.cert-entry + .cert-entry {
+.cert-entry + .cert-entry,
+.cert-hidden > .cert-entry:first-child {
   border-top: 1px solid var(--color-rule-2);
 }
 
