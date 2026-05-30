@@ -106,6 +106,10 @@ async function gitSync(message) {
   }
 }
 
+let syncPromise = Promise.resolve();
+function queueGitSync(message) {
+  syncPromise = syncPromise.then(() => gitSync(message)).catch(console.error);
+}
 
 /**
  * Ensure each skill name used by an entry exists in the Skills collection.
@@ -221,7 +225,7 @@ const server = createServer(async (req, res) => {
         const body = await readBody(req);
         writeFileSync(siteFile, JSON.stringify(body.data, null, 2) + '\n', 'utf-8');
         rebuild();
-        await gitSync('Update site settings');
+        queueGitSync('Update site settings');
         return sendJson(res, 200, { ok: true });
       }
 
@@ -236,7 +240,7 @@ const server = createServer(async (req, res) => {
         const skillField = SKILL_FIELD[collection];
         if (skillField && Array.isArray(data[skillField])) addedSkills = ensureSkills(data[skillField]);
         rebuild();
-        await gitSync(`Add/Update entry in ${collection}: ${name}`);
+        queueGitSync(`Add/Update entry in ${collection}: ${name}`);
         return sendJson(res, 200, { ok: true, slug: name, addedSkills });
       }
 
@@ -256,7 +260,7 @@ const server = createServer(async (req, res) => {
         if (!existsSync(assetsDir)) mkdirSync(assetsDir, { recursive: true });
         writeFileSync(resolve(assetsDir, safeName), Buffer.from(m[2], 'base64'));
         rebuild();
-        await gitSync('Upload profile image');
+        queueGitSync('Upload profile image');
         return sendJson(res, 200, { ok: true, path: 'assets/media/' + safeName });
       }
 
@@ -268,7 +272,7 @@ const server = createServer(async (req, res) => {
           if (existsSync(fp)) { try { unlinkSync(fp); } catch (e) { /* ignore */ } }
         }
         rebuild();
-        await gitSync('Delete profile image');
+        queueGitSync('Delete profile image');
         return sendJson(res, 200, { ok: true });
       }
 
@@ -290,7 +294,7 @@ const server = createServer(async (req, res) => {
         if (!existsSync(mediaDir)) mkdirSync(mediaDir, { recursive: true });
         writeFileSync(resolve(mediaDir, unique), Buffer.from(m[2], 'base64'));
         rebuild();
-        await gitSync(`Upload media: ${unique}`);
+        queueGitSync(`Upload media: ${unique}`);
         return sendJson(res, 200, { ok: true, path: 'assets/media/' + unique });
       }
 
@@ -301,7 +305,7 @@ const server = createServer(async (req, res) => {
         const file = resolve(dir, safeSlug(slug) + '.json');
         if (existsSync(file)) unlinkSync(file);
         rebuild();
-        await gitSync(`Delete entry from ${collection}: ${slug}`);
+        queueGitSync(`Delete entry from ${collection}: ${slug}`);
         return sendJson(res, 200, { ok: true });
       }
 
@@ -323,7 +327,7 @@ const server = createServer(async (req, res) => {
           }
         });
         rebuild();
-        await gitSync(`Reorder collection: ${collection}`);
+        queueGitSync(`Reorder collection: ${collection}`);
         return sendJson(res, 200, { ok: true, written });
       }
 
