@@ -252,17 +252,17 @@ const server = createServer(async (req, res) => {
           : 'png';
         const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'].includes(ext) ? ext : 'png';
         const safeName = 'profile.' + safeExt;
-        const assetsDir = resolve(root, 'assets');
+        const assetsDir = resolve(root, 'src', 'content', 'media');
         if (!existsSync(assetsDir)) mkdirSync(assetsDir, { recursive: true });
         writeFileSync(resolve(assetsDir, safeName), Buffer.from(m[2], 'base64'));
         rebuild();
         await gitSync('Upload profile image');
-        return sendJson(res, 200, { ok: true, path: 'assets/' + safeName });
+        return sendJson(res, 200, { ok: true, path: 'assets/media/' + safeName });
       }
 
       if (url === '/api/upload' && method === 'DELETE') {
         // Remove any uploaded profile.* photo (reset to default/placeholder).
-        const assetsDir = resolve(root, 'assets');
+        const assetsDir = resolve(root, 'src', 'content', 'media');
         for (const ext of ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif']) {
           const fp = resolve(assetsDir, 'profile.' + ext);
           if (existsSync(fp)) { try { unlinkSync(fp); } catch (e) { /* ignore */ } }
