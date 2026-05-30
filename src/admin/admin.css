@@ -282,6 +282,7 @@ a { color: var(--color-accent); text-decoration: none; }
 }
 .adm-field input[type="text"],
 .adm-field input[type="number"],
+.adm-field input[type="password"],
 .adm-field textarea,
 .adm-field select {
   width: 100%; font-family: var(--font-body); font-size: var(--text-base);
