@@ -5,7 +5,7 @@
  * Model: { role, organization, startDate: "YYYY-MM", endDate: "YYYY-MM" | "" }
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -17,7 +17,8 @@ const MONTH_NAMES = [
 function loadOrgData() {
   const here = dirname(fileURLToPath(import.meta.url));
   const dir = resolve(here, '..', 'src', 'content', 'organizations');
-  return readdirSync(dir)
+  if (!existsSync(dir)) return [];
+  return (existsSync(dir) ? readdirSync(dir) : [])
     .filter((f) => f.endsWith('.json'))
     .map((f) => JSON.parse(readFileSync(resolve(dir, f), 'utf-8')));
 }

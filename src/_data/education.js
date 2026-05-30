@@ -4,7 +4,7 @@
  * gpa, gpaScale, note). Composes display strings and sorts newest-first by
  * startDate (falling back to `order`).
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -17,7 +17,7 @@ function fmtYear(ym) {
 }
 
 export default function () {
-  const items = readdirSync(dir)
+  const items = (existsSync(dir) ? readdirSync(dir) : [])
     .filter((f) => f.endsWith('.json'))
     .map((f) => {
       const raw = JSON.parse(readFileSync(resolve(dir, f), 'utf-8'));

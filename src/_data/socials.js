@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 export default function () {
   const dir = resolve(__dirname, '../content/socials');
   if (!existsSync(dir)) return [];
-  const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
+  const files = (existsSync(dir) ? readdirSync(dir) : []).filter((f) => f.endsWith('.json'));
   const items = [];
   for (const f of files) {
     try {

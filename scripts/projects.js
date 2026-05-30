@@ -5,14 +5,15 @@
  * Model: { name, role, description, tech: string[], url, featured }
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 function loadProjectData() {
   const here = dirname(fileURLToPath(import.meta.url));
   const dir = resolve(here, '..', 'src', 'content', 'projects');
-  return readdirSync(dir)
+  if (!existsSync(dir)) return [];
+  return (existsSync(dir) ? readdirSync(dir) : [])
     .filter((f) => f.endsWith('.json'))
     .map((f) => JSON.parse(readFileSync(resolve(dir, f), 'utf-8')))
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));

@@ -57,7 +57,7 @@ function collectionDir(collection) {
 function readCollection(collection) {
   const dir = collectionDir(collection);
   if (!dir || !existsSync(dir)) return [];
-  return readdirSync(dir)
+  return (existsSync(dir) ? (existsSync(dir) ? readdirSync(dir) : []) : [])
     .filter((f) => f.endsWith('.json'))
     .map((f) => ({ slug: f.replace(/\.json$/, ''), data: JSON.parse(readFileSync(resolve(dir, f), 'utf-8')) }));
 }
@@ -139,7 +139,7 @@ function ensureSkills(names) {
   const list = (names || []).map((s) => String(s).trim()).filter(Boolean);
   if (!list.length) return 0;
   const dir = collectionDir('skills');
-  const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
+  const files = (existsSync(dir) ? (existsSync(dir) ? readdirSync(dir) : []) : []).filter((f) => f.endsWith('.json'));
   const cats = files.map((f) => ({ file: f, data: JSON.parse(readFileSync(resolve(dir, f), 'utf-8')) }));
 
   // Build a case-insensitive set of all existing skill names.

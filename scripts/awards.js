@@ -15,7 +15,7 @@ function loadAwardData() {
   const here = dirname(fileURLToPath(import.meta.url));
   const dir = resolve(here, '..', 'src', 'content', 'awards');
   if (!existsSync(dir)) return [];
-  return readdirSync(dir)
+  return (existsSync(dir) ? readdirSync(dir) : [])
     .filter((f) => f.endsWith('.json'))
     .sort()
     .map((f) => JSON.parse(readFileSync(resolve(dir, f), 'utf-8')));

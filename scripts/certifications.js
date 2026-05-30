@@ -26,7 +26,7 @@ function loadCertData() {
   const here = dirname(fileURLToPath(import.meta.url));
   const dir = resolve(here, '..', 'src', 'content', 'certifications');
   if (!existsSync(dir)) return [];
-  return readdirSync(dir)
+  return (existsSync(dir) ? readdirSync(dir) : [])
     .filter((f) => f.endsWith('.json'))
     .map((f) => JSON.parse(readFileSync(resolve(dir, f), 'utf-8')));
 }
