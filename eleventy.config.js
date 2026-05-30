@@ -31,7 +31,9 @@ export default function (eleventyConfig) {
 
   // ── Certifications ───────────────────────────────────────────────────────
   eleventyConfig.addFilter('certNormalizeSort', (list) => {
-    const normalized = (list || []).map(normalizeCert);
+    const normalized = (list || [])
+      .map(normalizeCert)
+      .filter((cert) => !isExpired(cert));
     return sortCertifications(normalized);
   });
   eleventyConfig.addFilter('certDate', (cert) => formatCertDate(cert.expirationDate));

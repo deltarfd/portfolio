@@ -445,7 +445,7 @@ function renderList(schema, key) {
       const isHidden = Boolean(d.hidden);
       const card = el('div', { class: 'adm-card' + (reorderActive ? ' is-draggable' : '') + (isHidden ? ' is-hidden' : '') },
         handle,
-        el('div', { class: 'adm-card__body' },
+        el('div', { class: 'adm-card__body', style: 'cursor: pointer;', onclick: () => openEditor(schema, key, entry) },
           tags,
           el('p', { class: 'adm-card__title' }, schema.title(d) || '(untitled)'),
           schema.meta(d) ? el('p', { class: 'adm-card__meta' }, schema.meta(d)) : null,
