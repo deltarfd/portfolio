@@ -253,6 +253,7 @@ const server = createServer(async (req, res) => {
         const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'].includes(ext) ? ext : 'png';
         const safeName = 'profile.' + safeExt;
         const assetsDir = resolve(root, 'assets');
+        if (!existsSync(assetsDir)) mkdirSync(assetsDir, { recursive: true });
         writeFileSync(resolve(assetsDir, safeName), Buffer.from(m[2], 'base64'));
         rebuild();
         await gitSync('Upload profile image');
