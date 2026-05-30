@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { execFile, exec } from 'node:child_process';
 import { promisify } from 'node:util';
+import { timingSafeEqual } from 'node:crypto';
 
 const execAsync = promisify(exec);
 
@@ -211,14 +212,45 @@ function serveStatic(req, res, urlPath) {
   res.end(readFileSync(target));
 }
 
+const failedLogins = new Map();
+
+function isRateLimited(ip) {
+  const record = failedLogins.get(ip);
+  if (!record) return false;
+  if (Date.now() - record.time > 15 * 60 * 1000) {
+    failedLogins.delete(ip);
+    return false;
+  }
+  return record.count >= 5;
+}
+
+function recordFailedLogin(ip) {
+  const record = failedLogins.get(ip) || { count: 0, time: Date.now() };
+  record.count++;
+  record.time = Date.now();
+  failedLogins.set(ip, record);
+}
+
 const server = createServer(async (req, res) => {
   const { url, method, headers } = req;
+  const ip = req.socket.remoteAddress;
+
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 
   // ── Authentication ─────────────────────────────────────────────────────
-  if (process.env.ADMIN_PASSWORD && url.startsWith('/api/')) {
+  const isProtected = url.startsWith('/api/') || url === '/admin' || url.startsWith('/admin/');
+  if (process.env.ADMIN_PASSWORD && isProtected) {
+    if (isRateLimited(ip)) {
+      res.writeHead(429);
+      res.end('Too Many Requests');
+      return;
+    }
+
     const auth = headers.authorization;
     if (!auth || auth.indexOf('Basic ') !== 0) {
-      res.writeHead(401);
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Admin"' });
       res.end('Unauthorized');
       return;
     }
@@ -227,11 +259,28 @@ const server = createServer(async (req, res) => {
     const [username, password] = credentials.split(':');
     
     const expectedUser = process.env.ADMIN_USERNAME || 'admin';
-    if (username !== expectedUser || password !== process.env.ADMIN_PASSWORD) {
-      res.writeHead(401);
+    const expectedPass = process.env.ADMIN_PASSWORD;
+    
+    let userMatch = false;
+    let passMatch = false;
+    try {
+      const uBuf = Buffer.from(username || '');
+      const euBuf = Buffer.from(expectedUser);
+      if (uBuf.length === euBuf.length) userMatch = timingSafeEqual(uBuf, euBuf);
+      
+      const pBuf = Buffer.from(password || '');
+      const epBuf = Buffer.from(expectedPass);
+      if (pBuf.length === epBuf.length) passMatch = timingSafeEqual(pBuf, epBuf);
+    } catch(e) {}
+
+    if (!userMatch || !passMatch) {
+      recordFailedLogin(ip);
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Admin"' });
       res.end('Unauthorized');
       return;
     }
+    
+    failedLogins.delete(ip);
   }
 
   // ── API ──────────────────────────────────────────────────────────────
