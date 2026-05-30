@@ -292,16 +292,21 @@ function renderNav() {
 }
 
 // ── Views ─────────────────────────────────────────────────────────────────
-function render() {
+function render(preserveScroll = false) {
+  const scrollPos = window.scrollY;
   renderNav();
   const main = document.getElementById('adm-main');
   main.innerHTML = '';
   const schema = SCHEMAS[current];
   if (schema.single) main.append(renderForm(schema, current, store.site, null));
   else main.append(renderList(schema, current));
-  // Scroll to the top of the main panel so the title is visible.
-  main.scrollIntoView({ behavior: 'instant', block: 'start' });
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  
+  if (!preserveScroll) {
+    main.scrollIntoView({ behavior: 'instant', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  } else {
+    window.scrollTo({ top: scrollPos, behavior: 'instant' });
+  }
 }
 
 // Per-collection UI state (sort direction + search query).
@@ -1059,7 +1064,7 @@ async function toggleHidden(key, entry) {
     await api('/api/entry', 'POST', { collection: key, slug: entry.slug, data });
     status(data.hidden ? 'Hidden · site rebuilt' : 'Visible · site rebuilt', 'ok');
     await load();
-    render();
+    render(true);
   } catch (e) {
     status('Toggle failed: ' + e.message, 'err');
   }
@@ -1072,7 +1077,7 @@ async function removeEntry(key, entry) {
     await api('/api/entry', 'DELETE', { collection: key, slug: entry.slug });
     status('Deleted · site rebuilt', 'ok');
     await load();
-    render();
+    render(true);
   } catch (e) {
     status('Delete failed: ' + e.message, 'err');
   }
