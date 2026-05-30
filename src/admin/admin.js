@@ -74,13 +74,16 @@ const SCHEMAS = {
   },
   certifications: {
     label: 'Certifications', singular: 'Certification',
-    title: (d) => d.name, meta: (d) => {
-      const parts = [d.organization];
-      if (d.issued) parts.push('Issued ' + d.issued);
-      parts.push(d.expiration || 'No expiration');
-      return parts.join(' · ');
+    title: (d) => d.name,
+    meta: (d) => {
+      let status = '';
+      if (d.expiration) {
+        const [y, m] = d.expiration.split('-');
+        if (y && m && new Date(y, m - 1, 1) < new Date()) status = ' (Expired)';
+      }
+      return `${d.organization || 'Unknown'} · ${d.expiration ? d.expiration + status : 'No expiration'}`;
     },
-    slug: (d) => slugify(d.name),
+    slug: (d) => slugify(d.name + ' ' + d.organization),
     sortKey: (d) => d.expiration || '',
     skillField: 'skills',
     fields: [
