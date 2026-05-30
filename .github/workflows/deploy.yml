@@ -5,6 +5,8 @@ on:
     branches:
       - main
   workflow_dispatch:
+  repository_dispatch:
+    types: [update_content]
 
 jobs:
   deploy:
@@ -22,6 +24,11 @@ jobs:
             # Stash any local changes to prevent conflicts, pull latest, and restore
             git stash
             git pull origin main
+            git submodule update --init --recursive
+            
+            # Also pull latest content in submodule
+            git submodule foreach 'git stash && git pull origin main && git stash pop || true'
+            
             git stash pop || true
             
             # Install dependencies
