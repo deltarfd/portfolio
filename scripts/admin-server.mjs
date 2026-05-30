@@ -185,7 +185,10 @@ function serveStatic(req, res, urlPath) {
   }
   if (!existsSync(target) || statSync(target).isDirectory()) { res.writeHead(404); res.end('Not found'); return; }
   const type = MIME[extname(target)] || 'application/octet-stream';
-  res.writeHead(200, { 'Content-Type': type });
+  res.writeHead(200, {
+    'Content-Type': type,
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+  });
   res.end(readFileSync(target));
 }
 
