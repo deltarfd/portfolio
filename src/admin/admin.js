@@ -7,12 +7,28 @@ const API = '';
 const SCHEMAS = {
   socials: {
     label: 'Contact & Socials', singular: 'Link',
-    title: (d) => d.platform || 'New Link', meta: (d) => d.label || d.url,
+    title: (d) => {
+      const icons = {
+        Email: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+        LinkedIn: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
+        GitHub: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>',
+        X: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>',
+        Instagram: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+        YouTube: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>',
+        Medium: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42zm2.81 0c0 3.13-.53 5.67-1.18 5.67-.66 0-1.18-2.54-1.18-5.67 0-3.14.52-5.67 1.18-5.67.65 0 1.18 2.53 1.18 5.67z"/></svg>',
+        Behance: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7h6.635c1.47 0 2.54.341 3.208 1.025.666.684.999 1.625.999 2.825 0 .867-.202 1.576-.607 2.128-.404.551-1.01.96-1.815 1.226.966.19 1.71.644 2.23 1.36.52.717.781 1.62.781 2.71 0 1.282-.363 2.296-1.089 3.04C12.115 22.062 10.824 22.434 8.87 22.434H2.5V7zm3.226 5.922h2.906c.642 0 1.134-.14 1.475-.418.341-.28.512-.728.512-1.346 0-.6-.182-1.034-.546-1.302-.365-.268-.909-.402-1.632-.402H5.726v3.468zm0 6.643h3.58c.84 0 1.46-.178 1.861-.535.4-.356.602-.897.602-1.621 0-.671-.212-1.2-.638-1.586-.425-.386-1.042-.58-1.85-.58H5.726v4.322zM21.5 13.918h-6.242c.046.732.28 1.298.7 1.696.42.399.967.598 1.641.598.6 0 1.09-.16 1.467-.478.378-.318.625-.776.741-1.373h2.96c-.244 1.467-.847 2.585-1.808 3.354-.961.77-2.164 1.155-3.608 1.155-1.633 0-2.923-.526-3.87-1.578C12.535 16.24 12.061 14.808 12.061 13c0-1.745.47-3.155 1.41-4.23.94-1.074 2.196-1.611 3.766-1.611 1.558 0 2.784.512 3.676 1.536.892 1.025 1.339 2.455 1.339 4.292v.93zm-3.08-2.316c-.048-.636-.264-1.127-.648-1.474-.383-.347-.853-.52-1.41-.52-.572 0-1.05.18-1.433.541-.383.36-.62.877-.71 1.55h4.201zM14.47 5.093h5.275v2.302h-5.275V5.093z"/></svg>',
+        Other: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+      };
+      const svg = icons[d.platform] || icons.Other;
+      const wrappedSvg = '<span style="display:inline-flex; align-items:center; justify-content:center; width:1.1em; height:1.1em; margin-right:0.3em; vertical-align:-0.15em; color:var(--color-ink-light);">' + svg + '</span>';
+      return wrappedSvg + (d.platform || 'New Link');
+    },
+    meta: (d) => d.label || d.url,
     slug: (d) => `${String(d.order ?? 1).padStart(2, '0')}-${slugify(d.platform)}`,
     sortKey: (d) => String(d.order ?? 99).padStart(4, '0'),
     fields: [
       { name: 'order', label: 'Order', type: 'number', default: 1, hint: 'Lower numbers appear first.' },
-      { name: 'platform', label: 'Platform', type: 'select', options: ['Email', 'LinkedIn', 'GitHub', 'Twitter', 'Instagram', 'YouTube', 'Medium', 'Other'] },
+      { name: 'platform', label: 'Platform', type: 'select', options: ['Email', 'LinkedIn', 'GitHub', 'X', 'Instagram', 'YouTube', 'Medium', 'Behance', 'Other'] },
       { name: 'label', label: 'Display Label', type: 'text', hint: 'What the user sees (e.g. deltarfd@live.com or github.com/deltarfd)' },
       { name: 'url', label: 'URL / Link', type: 'text', hint: 'The actual link (e.g. mailto:deltarfd@live.com or https://github.com/deltarfd)' }
     ],
@@ -157,7 +173,7 @@ const SCHEMAS = {
   },
 };
 
-const ORDER = ['site', 'experience', 'projects', 'skills', 'certifications', 'awards', 'education', 'organizations'];
+const ORDER = ['site', 'socials', 'experience', 'projects', 'skills', 'certifications', 'awards', 'education', 'organizations'];
 
 // Parse "YYYY-MM" → comparable number (YYYYMM), or 0 when absent.
 function ym(v) {
@@ -181,6 +197,7 @@ const DISPLAY_SORT = {
   experience: (a, b) => (ym(b.startDate) - ym(a.startDate)),
   projects: (a, b) => (Number(Boolean(b.featured)) - Number(Boolean(a.featured))),
   skills: (a, b) => ord(a) - ord(b),
+  socials: (a, b) => ord(a) - ord(b),
   certifications: (a, b) => {
     if (Boolean(a.isKey) !== Boolean(b.isKey)) return a.isKey ? -1 : 1;
     if (a.isKey && b.isKey) {
@@ -488,7 +505,7 @@ function renderList(schema, key) {
         handle,
         el('div', { class: 'adm-card__body', style: 'cursor: pointer;', onclick: () => openEditor(schema, key, entry) },
           tags,
-          el('p', { class: 'adm-card__title' }, schema.title(d) || '(untitled)'),
+          el('p', { class: 'adm-card__title', html: schema.title(d) || '(untitled)' }),
           schema.meta(d) ? el('p', { class: 'adm-card__meta' }, schema.meta(d)) : null,
         ),
         el('div', { class: 'adm-card__actions' },
