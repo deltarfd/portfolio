@@ -12,8 +12,11 @@
     "admin": "eleventy && node scripts/admin-server.mjs",
     "start": "eleventy && NODE_ENV=production node scripts/admin-server.mjs"
   },
+  "dependencies": {
+    "@11ty/eleventy": "^3.1.5"
+  },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.5",
+
     "axe-core": "^4.11.4",
     "fast-check": "3.23.2",
     "jsdom": "^29.1.1",
