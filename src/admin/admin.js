@@ -696,7 +696,7 @@ function renderSkillsField(f, arr, onChange) {
     const chosen = new Set(items.map((s) => s.toLowerCase()));
     let pool = allSkillNames().filter((n) => !chosen.has(n.toLowerCase()));
     if (query) pool = pool.filter((n) => n.toLowerCase().includes(query));
-    return pool.slice(0, 8);
+    return pool;
   }
 
   function redraw(focusInput) {
