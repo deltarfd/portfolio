@@ -23,7 +23,7 @@ const execAsync = promisify(exec);
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const contentRoot = resolve(root, 'src', 'content');
-const siteFile = resolve(root, 'src', '_data', 'site.json');
+const siteFile = resolve(root, 'src', 'content', 'site.json');
 const PORT = process.env.PORT || 8888;
 
 const COLLECTIONS = ['experience', 'projects', 'skills', 'certifications', 'awards', 'organizations', 'education'];
@@ -113,7 +113,7 @@ async function gitSync(message) {
     }
     await execAsync('git config user.name "Admin Bot"', { cwd: root });
     await execAsync('git config user.email "admin-bot@example.com"', { cwd: root });
-    await execAsync('git add src/_data/site.json src/content', { cwd: root });
+    await execAsync('git add src/content/site.json src/content', { cwd: root });
     try {
       await execAsync(`git commit -m "${message}"`, { cwd: root });
       await execAsync('git push origin HEAD', { cwd: root });

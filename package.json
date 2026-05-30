@@ -10,14 +10,14 @@
     "dev": "eleventy --serve",
     "build": "eleventy",
     "admin": "eleventy && node scripts/admin-server.mjs",
-    "start": "eleventy && NODE_ENV=production node scripts/admin-server.mjs"
+    "start": "eleventy && cross-env NODE_ENV=production node scripts/admin-server.mjs"
   },
   "dependencies": {
     "@11ty/eleventy": "^3.1.5"
   },
   "devDependencies": {
-
     "axe-core": "^4.11.4",
+    "cross-env": "^10.1.0",
     "fast-check": "3.23.2",
     "jsdom": "^29.1.1",
     "vitest": "2.1.8"

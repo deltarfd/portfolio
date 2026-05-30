@@ -1570,8 +1570,8 @@ a {
    Contact Section
    -------------------------------------------------------------------------- */
 .contact-links {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-lg);
   list-style: none;
   padding: 0;
@@ -1580,15 +1580,48 @@ a {
 
 .contact-link {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  padding: var(--space-md) 0;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-rule-2);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  transition: all var(--duration-fast) var(--easing-default);
   text-decoration: none;
-  border-bottom: 1px solid var(--color-rule-2);
 }
 
-.contact-link:first-child {
-  border-top: 1px solid var(--color-rule-2);
+.contact-link:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.contact-link__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-3);
+  color: var(--color-ink);
+  transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
+}
+
+.contact-link__icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.contact-link:hover .contact-link__icon {
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+.contact-link__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow: hidden;
 }
 
 .contact-link__label {
@@ -1602,16 +1635,12 @@ a {
 
 .contact-link__value {
   font-family: var(--font-body);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: var(--weight-regular);
   color: var(--color-ink);
-  transition: color 0.2s ease;
-}
-
-@media (hover: hover) {
-  .contact-link:hover .contact-link__value {
-    color: var(--color-accent);
-  }
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* --------------------------------------------------------------------------
