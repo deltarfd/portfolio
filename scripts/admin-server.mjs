@@ -194,6 +194,9 @@ function serveStatic(req, res, urlPath) {
   let target = filePath;
   if (rel.startsWith('/admin/')) {
     target = normalize(join(root, 'src', rel));
+    if (!existsSync(target)) {
+      target = normalize(join(root, '_site', rel));
+    }
   } else if (rel.startsWith('/assets/media/')) {
     target = normalize(join(root, 'src', 'content', 'media', rel.replace(/^\/assets\/media\//, '')));
   } else {
