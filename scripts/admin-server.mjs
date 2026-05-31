@@ -114,7 +114,7 @@ async function gitSync(message) {
     }
     await execAsync('git config user.name "Admin Bot"', { cwd: root });
     await execAsync('git config user.email "admin-bot@example.com"', { cwd: root });
-    await execAsync('git add src/content/site.json src/content', { cwd: root });
+    await execAsync('git add src/content', { cwd: root });
     try {
       await execAsync(`git commit -m "${message}"`, { cwd: root });
       await execAsync('git push origin HEAD', { cwd: root });

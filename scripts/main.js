@@ -110,7 +110,7 @@
   });
 
   // --- Sticky Navigation ---
-  var heroSection = document.getElementById('hero');
+  var heroSection = document.getElementById('profile');
 
   if (heroSection && navHeader) {
     var stickyObserver = new IntersectionObserver(function (entries) {
@@ -166,8 +166,6 @@
     navToggle.setAttribute('aria-label', 'Close navigation menu');
     navOverlay.classList.add(OPEN_CLASS);
     navOverlay.setAttribute('aria-hidden', 'false');
-    // Prevent body scroll while overlay is open
-    document.body.style.overflow = 'hidden';
   }
 
   /**
@@ -179,8 +177,6 @@
     navToggle.setAttribute('aria-label', 'Open navigation menu');
     navOverlay.classList.remove(OPEN_CLASS);
     navOverlay.setAttribute('aria-hidden', 'true');
-    // Restore body scroll
-    document.body.style.overflow = '';
   }
 
   /**

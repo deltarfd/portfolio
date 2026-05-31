@@ -837,6 +837,73 @@ function renderSkillsField(f, arr, onChange) {
   return box;
 }
 
+function showCropperModal(dataUrl, onSave) {
+  const modal = el('div', { class: 'adm-modal' });
+  const box = el('div', { class: 'adm-modal__box' });
+  const body = el('div', { class: 'adm-modal__body' });
+  
+  const img = el('img');
+  body.append(img);
+  
+  const actions = el('div', { class: 'adm-modal__actions' });
+  
+  const zoomInBtn = el('button', { type: 'button', class: 'btn btn--ghost', title: 'Zoom In' }, '🔍+');
+  const zoomOutBtn = el('button', { type: 'button', class: 'btn btn--ghost', title: 'Zoom Out' }, '🔍-');
+  
+  const cancelBtn = el('button', { type: 'button', class: 'btn btn--ghost', onclick: () => {
+    if (dataUrl.startsWith('blob:')) URL.revokeObjectURL(dataUrl);
+    modal.remove();
+  } }, 'Cancel');
+  
+  const saveBtn = el('button', { type: 'button', class: 'btn btn--primary' }, 'Save Crop');
+  actions.append(zoomOutBtn, zoomInBtn, cancelBtn, saveBtn);
+  
+  box.append(body, actions);
+  modal.append(box);
+  document.body.append(modal);
+  
+  img.onload = () => {
+    // DO NOT revoke ObjectURL here! Cropper.js duplicates the image internally
+    // and needs the URL to remain valid until we're done.
+    
+    const cropper = new window.Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 0, // 0 = no restrictions, so they can freely drag the image even if it's smaller
+      dragMode: 'move',
+      autoCropArea: 1, // fill the screen
+      restore: false,
+      guides: false,
+      center: false,
+      highlight: false,
+      cropBoxMovable: false, // fixed circle in center
+      cropBoxResizable: false, // fixed circle in center
+      toggleDragModeOnDblclick: false,
+    });
+    
+    zoomInBtn.onclick = () => cropper.zoom(0.1);
+    zoomOutBtn.onclick = () => cropper.zoom(-0.1);
+    
+    saveBtn.onclick = () => {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+      const canvas = cropper.getCroppedCanvas({ width: 512, height: 512, fillColor: '#fff' });
+      const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      cropper.destroy();
+      modal.remove();
+      if (dataUrl.startsWith('blob:')) URL.revokeObjectURL(dataUrl);
+      onSave(croppedDataUrl);
+    };
+  };
+
+  img.onerror = () => {
+    if (dataUrl.startsWith('blob:')) URL.revokeObjectURL(dataUrl);
+    alert("Could not load the image for cropping. Please ensure it is a valid image file.");
+    modal.remove();
+  };
+  
+  img.src = dataUrl;
+}
+
 /* Image field: preview + upload button. Uploads to assets/ via /api/upload
    and stores the returned path (e.g. "assets/profile.jpg"). */
 function renderImageField(f, value, onChange) {
@@ -849,7 +916,12 @@ function renderImageField(f, value, onChange) {
     if (currentPath) {
       // cache-bust so a re-upload shows immediately
       const img = el('img', { src: '/' + currentPath + '?t=' + Date.now(), alt: 'Profile preview' });
-      img.onerror = () => { img.style.display = 'none'; };
+      img.onerror = () => { 
+        img.style.display = 'none'; 
+        if (!preview.querySelector('.adm-image-empty')) {
+          preview.append(el('span', { class: 'adm-image-empty' }, 'No photo yet'));
+        }
+      };
       preview.append(img);
     } else {
       preview.append(el('span', { class: 'adm-image-empty' }, 'No photo yet'));
@@ -857,21 +929,47 @@ function renderImageField(f, value, onChange) {
 
     const fileInput = el('input', {
       type: 'file', accept: 'image/*', style: 'display:none', id: 'imgfile-' + f.name,
-      onchange: (e) => {
-        const file = e.target.files && e.target.files[0];
+      onchange: async (e) => {
+        let file = e.target.files && e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            status('Uploading photo…');
-            const resp = await api('/api/upload', 'POST', { filename: file.name, dataUrl: reader.result });
-            currentPath = resp.path;
-            onChange(currentPath);
-            status('Photo uploaded · site rebuilt', 'ok');
-            redraw();
-          } catch (err) { status('Upload failed: ' + err.message, 'err'); }
-        };
-        reader.readAsDataURL(file);
+        
+        try {
+          if (file.name.toLowerCase().endsWith('.heic') || file.type === 'image/heic') {
+            status('Converting HEIC format…');
+            if (window.heic2any) {
+              const blob = await window.heic2any({ blob: file, toType: 'image/jpeg' });
+              file = Array.isArray(blob) ? blob[0] : blob;
+              // File object properties are read-only, so we just pass the original name modified
+              file.originalName = e.target.files[0].name.replace(/\.[^/.]+$/, ".jpg");
+              status('');
+            } else {
+              alert('HEIC conversion library not loaded. Please use a JPEG or PNG.');
+              status('');
+              return;
+            }
+          }
+
+          if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file.');
+            return;
+          }
+
+          const objectUrl = URL.createObjectURL(file);
+          showCropperModal(objectUrl, async (croppedDataUrl) => {
+            try {
+              status('Uploading photo…');
+              const finalName = file.originalName || file.name || 'image.jpg';
+              const newFilename = finalName.replace(/\.[^/.]+$/, "") + '.jpg';
+              const resp = await api('/api/upload', 'POST', { filename: newFilename, dataUrl: croppedDataUrl });
+              currentPath = resp.path;
+              onChange(currentPath);
+              status('Photo uploaded · site rebuilt', 'ok');
+              redraw();
+            } catch (err) { status('Upload failed: ' + err.message, 'err'); }
+          });
+        } catch (err) {
+          status('Failed to process image: ' + err.message, 'err');
+        }
       },
     });
     const pickBtn = el('button', { type: 'button', class: 'btn', onclick: () => fileInput.click() },
