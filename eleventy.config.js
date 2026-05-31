@@ -15,6 +15,9 @@ import { sortOrganizations, formatOrgDateRange, normalizeOrg } from './scripts/o
 import { sortProjects, mediaList } from './scripts/projects.js';
 
 export default function (eleventyConfig) {
+  // Global build time for cache busting CSS and JS
+  eleventyConfig.addGlobalData("buildTime", () => Date.now());
+
   // Content JSON files are loaded via _data loaders, not rendered as pages.
   eleventyConfig.ignores.add('src/content/**');
 

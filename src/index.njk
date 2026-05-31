@@ -37,9 +37,9 @@ permalink: /index.html
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="styles/tokens.css">
-  <link rel="stylesheet" href="styles/layout.css">
-  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/tokens.css?v={{ buildTime }}">
+  <link rel="stylesheet" href="styles/layout.css?v={{ buildTime }}">
+  <link rel="stylesheet" href="styles/components.css?v={{ buildTime }}">
 </head>
 <body>
 
@@ -407,6 +407,6 @@ permalink: /index.html
     <img class="lightbox__img" id="lightbox-img" src="" alt="">
   </div>
 
-  <script src="scripts/main.js" defer></script>
+  <script src="scripts/main.js?v={{ buildTime }}" defer></script>
 </body>
 </html>

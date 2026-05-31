@@ -1,3 +1,6 @@
+---
+permalink: /admin/index.html
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,8 +26,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@300..600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="/styles/tokens.css">
-  <link rel="stylesheet" href="/admin/admin.css">
+  <link rel="stylesheet" href="/styles/tokens.css?v={{ buildTime }}">
+  <link rel="stylesheet" href="/admin/admin.css?v={{ buildTime }}">
   <link rel="icon" href="/favicon.png">
 </head>
 <body>
@@ -52,6 +55,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" crossorigin="anonymous"></script>
-  <script type="module" src="/admin/admin.js?v=9"></script>
+  <script type="module" src="/admin/admin.js?v={{ buildTime }}"></script>
 </body>
 </html>
