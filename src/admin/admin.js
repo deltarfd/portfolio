@@ -174,7 +174,7 @@ const SCHEMAS = {
   },
 };
 
-const ORDER = ['site', 'socials', 'experience', 'projects', 'skills', 'certifications', 'awards', 'education', 'organizations'];
+const ORDER = ['site', 'experience', 'projects', 'skills', 'certifications', 'awards', 'education', 'organizations', 'socials'];
 
 // Parse "YYYY-MM" → comparable number (YYYYMM), or 0 when absent.
 function ym(v) {
@@ -317,6 +317,24 @@ function renderNav() {
     );
     nav.append(el('li', {}, btn));
   }
+
+  const syncBtn = el('button', { class: 'btn btn--ghost', style: 'margin-top: 1.5rem; width: 100%; border: 1px dashed var(--color-ink-border); opacity: 0.7;', onclick: async () => {
+    try {
+      const btnEl = event.currentTarget;
+      btnEl.disabled = true;
+      btnEl.textContent = 'Syncing...';
+      status('Pushing changes to GitHub…');
+      await api('/api/sync', 'POST', { message: 'Manual sync from Admin Panel' });
+      status('Synced to GitHub successfully', 'ok');
+      btnEl.textContent = 'Sync to GitHub';
+      btnEl.disabled = false;
+    } catch (e) {
+      status('Sync failed: ' + e.message, 'err');
+      event.currentTarget.textContent = 'Sync to GitHub';
+      event.currentTarget.disabled = false;
+    }
+  }}, 'Sync to GitHub');
+  nav.append(el('li', {}, syncBtn));
 }
 
 // ── Views ─────────────────────────────────────────────────────────────────

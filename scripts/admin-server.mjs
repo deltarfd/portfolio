@@ -89,8 +89,8 @@ function rebuild() {
   }, 500);
 }
 
-async function gitSync(message) {
-  if (process.env.NODE_ENV !== 'production') return;
+async function gitSync(message, force = false) {
+  if (process.env.NODE_ENV !== 'production' && !force) return;
   try {
     // 1. Sync Content Submodule (src/content)
     const contentDir = resolve(root, 'src', 'content');
@@ -290,6 +290,14 @@ const server = createServer(async (req, res) => {
         const out = { site: JSON.parse(readFileSync(siteFile, 'utf-8')) };
         for (const c of COLLECTIONS) out[c] = readCollection(c);
         return sendJson(res, 200, out);
+      }
+
+      if (url === '/api/sync' && method === 'POST') {
+        const { message } = await readBody(req);
+        gitSync(message || 'Manual sync triggered from Admin Panel', true)
+          .then(() => console.log('[admin] Manual sync complete'))
+          .catch(e => console.error('[admin] Manual sync failed:', e));
+        return sendJson(res, 200, { ok: true });
       }
 
       if (url === '/api/site' && method === 'PUT') {
