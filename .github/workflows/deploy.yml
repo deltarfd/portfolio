@@ -21,9 +21,10 @@ jobs:
           script: |
             cd /var/www/deltarfd-portfolio
             
-            # Stash any local changes to prevent conflicts, pull latest, and restore
-            git stash
-            git pull origin main
+            # Hard reset main repository to ensure no old or conflicting files remain on the VPS
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
             git submodule update --init --recursive
             
             # Also pull latest content in submodule
