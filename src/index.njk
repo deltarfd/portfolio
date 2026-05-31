@@ -186,12 +186,21 @@ permalink: /index.html
             {% for t in p.tech %}<li class="chip">{{ t }}</li>{% endfor %}
           </ul>
           {% endif %}
-          {% if p.url %}<a class="project-card__link" href="{{ p.url }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ p.name }} on GitHub">View on GitHub ↗</a>{% endif %}
+          {% if p.url %}
+          {% set linkLabel = p.urlLabel if p.urlLabel else 'View Project' %}
+          <a class="project-card__link" href="{{ p.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ linkLabel }} for {{ p.name }}">{{ linkLabel }} ↗</a>
+          {% endif %}
         </li>
         {% endfor %}
       </ul>
       <p class="project-more">
-        <a href="{{ site.github }}" target="_blank" rel="noopener noreferrer" aria-label="See all repositories on GitHub">See all repositories on GitHub ↗</a>
+        {% set githubUrl = "https://github.com" %}
+        {% for s in socials %}
+          {% if s.platform == 'GitHub' and s.url %}
+            {% set githubUrl = s.url %}
+          {% endif %}
+        {% endfor %}
+        <a href="{{ githubUrl }}" target="_blank" rel="noopener noreferrer" aria-label="See all repositories on GitHub">See all repositories on GitHub ↗</a>
       </p>
     </section>
 

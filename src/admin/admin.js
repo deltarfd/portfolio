@@ -83,6 +83,7 @@ const SCHEMAS = {
       { name: 'media', label: 'Preview images', type: 'medialist', hint: 'Optional. Add one or more screenshots/covers — upload files or paste image URLs (e.g. GitHub raw links). They show as a swipeable gallery.' },
       { name: 'tech', label: 'Tech / Skills', type: 'skills' },
       { name: 'url', label: 'Repo / live URL', type: 'text' },
+      { name: 'urlLabel', label: 'URL button text', type: 'text', hint: 'e.g. "View on GitHub", "Play Store". Defaults to "View Project" if left blank.' },
       { name: 'featured', label: 'Featured', type: 'boolean', hint: 'Pins the project first with a Featured badge.' },
     ],
   },
