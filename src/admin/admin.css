@@ -454,6 +454,13 @@ a { color: var(--color-accent); text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
 }
 .adm-media-preview img { width: 100%; height: 100%; object-fit: contain; }
+.adm-media-pdf {
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--color-accent); font-size: var(--text-sm);
+  text-decoration: none; padding: 0.5rem 1rem;
+}
+.adm-media-pdf:hover { text-decoration: underline; }
+.adm-media-pdf__icon { font-size: 1.4em; }
 .adm-media-url {
   flex: 1; min-width: 0; font-family: var(--font-body); font-size: var(--text-sm);
   color: var(--color-ink); background: var(--color-paper-3);

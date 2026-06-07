@@ -243,9 +243,14 @@ permalink: /index.html
           {% set cIssued = c | certIssued %}
           <p class="cert-entry__date">{% if cIssued %}Issued {{ cIssued }} · {% endif %}{{ c | certDate }}</p>
           {% if c.media %}
-          <a class="cert-entry__media" href="{{ c.media | mediaSrc }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ c.name }} certificate">
-            <img src="{{ c.media | mediaSrc }}" alt="{{ c.name }} certificate" loading="lazy">
+          {% if c.media | certIsPdf %}
+          <a class="cert-entry__media--pdf" href="{{ c.media | mediaSrc }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ c.name }} certificate PDF">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>
+            PDF Certificate
           </a>
+          {% else %}
+          <img class="cert-entry__media" src="{{ c.media | mediaSrc }}" alt="{{ c.name }} certificate" loading="lazy" data-zoomable tabindex="0" role="button" aria-label="Expand {{ c.name }} certificate">
+          {% endif %}
           {% endif %}
           {% if c.skills and c.skills.length %}
           <ul class="chip-list cert-entry__skills" aria-label="Skills">
@@ -287,6 +292,26 @@ permalink: /index.html
               {% if a.placement == '1st Place' %}<span class="badge badge--placement">1st Place</span>{% else %}<span class="award-entry__placement">{{ a.placement }}</span>{% endif %}
               <p class="award-entry__title">{{ a.title }}</p>
               <p class="award-entry__event">{{ a.eventName }}</p>
+              {% if a.media or a.url %}
+              <div class="award-entry__links">
+                {% if a.media %}
+                  {% if a.media | certIsPdf %}
+                  <a class="award-entry__link" href="{{ a.media | mediaSrc }}" target="_blank" rel="noopener noreferrer" aria-label="View proof PDF">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>
+                    Proof
+                  </a>
+                  {% else %}
+                  <img class="award-entry__proof" src="{{ a.media | mediaSrc }}" alt="{{ a.title }} proof" loading="lazy" data-zoomable tabindex="0" role="button" aria-label="Expand {{ a.title }} proof">
+                  {% endif %}
+                {% endif %}
+                {% if a.url %}
+                <a class="award-entry__link" href="{{ a.url }}" target="_blank" rel="noopener noreferrer" aria-label="View link for {{ a.title }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                  Link
+                </a>
+                {% endif %}
+              </div>
+              {% endif %}
             </div>
           </li>
           {% endfor %}

@@ -119,7 +119,7 @@ const SCHEMAS = {
       { name: 'issued', label: 'Issued', type: 'month', hint: 'Month the certificate was issued.' },
       { name: 'expiration', label: 'Expiration', type: 'month', hint: "Leave blank if it doesn't expire." },
       { name: 'credentialUrl', label: 'Verification URL', type: 'text', hint: 'Link to verify the credential (Credly, issuer page, etc.).' },
-      { name: 'media', label: 'Certificate image', type: 'media', hint: 'Optional. Upload a scan/screenshot, or paste an image URL.' },
+      { name: 'media', label: 'Certificate file', type: 'media', hint: 'Optional. Upload an image or PDF, or paste a URL.' },
       { name: 'isKey', label: 'Featured', type: 'boolean', hint: 'Shows in the highlighted certifications.' },
       { name: 'skills', label: 'Skills', type: 'skills' },
     ],
@@ -135,6 +135,8 @@ const SCHEMAS = {
       { name: 'eventName', label: 'Event / granting body', type: 'text' },
       { name: 'placement', label: 'Placement', type: 'select', options: ['1st Place', '2nd Place', '3rd Place', 'Finalist', 'Honoree'] },
       { name: 'category', label: 'Category', type: 'select', options: ['competition', 'academic'] },
+      { name: 'media', label: 'Certificate / proof', type: 'media', hint: 'Optional. Upload an image or PDF proof, or paste a URL.' },
+      { name: 'url', label: 'Verification / news URL', type: 'text', hint: 'Optional link to verify or news article about this award.' },
     ],
   },
   organizations: {
@@ -704,7 +706,7 @@ function renderMonthField(f, value, onChange) {
 
   const now = new Date().getFullYear();
   const years = [];
-  for (let y = now + 1; y >= 1975; y--) years.push(String(y));
+  for (let y = now + 10; y >= 1975; y--) years.push(String(y));
 
   const monthSel = el('select', { 'aria-label': f.label + ' month', onchange: (e) => { curM = e.target.value; commit(); } },
     el('option', { value: '' }, 'Month'),
@@ -1038,23 +1040,32 @@ function renderMediaField(f, value, onChange) {
     box.innerHTML = '';
 
     const preview = el('div', { class: 'adm-media-preview' });
+    const isPdf = (p) => /\.pdf(\?|$)/i.test(p || '');
     if (currentPath) {
-      preview.append(el('img', {
-        src: previewSrc(currentPath), alt: 'Preview',
-        onerror: function () {
-          this.style.display = 'none';
-          if (!preview.querySelector('.adm-image-empty')) {
-            preview.append(el('span', { class: 'adm-image-empty' }, 'Image not reachable'));
-          }
-        },
-      }));
+      if (isPdf(currentPath)) {
+        const src = previewSrc(currentPath);
+        preview.append(el('a', { class: 'adm-media-pdf', href: src, target: '_blank', rel: 'noopener noreferrer' },
+          el('span', { class: 'adm-media-pdf__icon' }, '📄'),
+          el('span', {}, 'View PDF certificate'),
+        ));
+      } else {
+        preview.append(el('img', {
+          src: previewSrc(currentPath), alt: 'Preview',
+          onerror: function () {
+            this.style.display = 'none';
+            if (!preview.querySelector('.adm-image-empty')) {
+              preview.append(el('span', { class: 'adm-image-empty' }, 'File not reachable'));
+            }
+          },
+        }));
+      }
     } else {
-      preview.append(el('span', { class: 'adm-image-empty' }, 'No image yet'));
+      preview.append(el('span', { class: 'adm-image-empty' }, 'No file yet'));
     }
 
     // Upload row.
     const fileInput = el('input', {
-      type: 'file', accept: 'image/*', style: 'display:none', id: 'mediafile-' + f.name,
+      type: 'file', accept: 'image/*,.pdf', style: 'display:none', id: 'mediafile-' + f.name,
       onchange: (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
@@ -1073,7 +1084,7 @@ function renderMediaField(f, value, onChange) {
       },
     });
     const pickBtn = el('button', { type: 'button', class: 'btn', onclick: () => fileInput.click() },
-      currentPath ? 'Replace with upload' : 'Upload image');
+      currentPath ? 'Replace' : 'Upload image / PDF');
     const uploadRow = el('div', { class: 'adm-listrow' }, pickBtn, fileInput);
     if (currentPath) {
       uploadRow.append(el('button', { type: 'button', class: 'btn btn--danger', onclick: () => {
@@ -1087,7 +1098,7 @@ function renderMediaField(f, value, onChange) {
 
     // URL row — paste an external image link.
     const urlInput = el('input', {
-      type: 'text', class: 'adm-media-url', placeholder: 'or paste an image URL (https://…)',
+      type: 'text', class: 'adm-media-url', placeholder: 'or paste a URL (image / PDF)',
       value: isAbsolute(currentPath) ? currentPath : '',
     });
     const useUrlBtn = el('button', { type: 'button', class: 'btn', onclick: () => {

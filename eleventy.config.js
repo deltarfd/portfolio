@@ -43,6 +43,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter('certDate', (cert) => formatCertDate(cert.expirationDate));
   eleventyConfig.addFilter('certIssued', (cert) => formatMonthYear(cert.issuedDate));
   eleventyConfig.addFilter('certExpired', (cert) => isExpired(cert));
+  eleventyConfig.addFilter('certIsPdf', (media) => media && /\.pdf(\?|$)/i.test(media));
 
   // ── Awards ───────────────────────────────────────────────────────────────
   eleventyConfig.addFilter('sortAwards', (list) => sortAwards(list || []));
